@@ -15,8 +15,8 @@ Puzzle / Arcade.
 
 ## Capturas de pantalla
 1. **Pantalla inicial:** Menú de selección de dificultad (Fácil, Medio, Difícil).
-![Pantalla inicial](./imagenes/comida1.png)
+![Pantalla inicial](/imagenes/comida1.png)
 2. **Gameplay:** Plato interactivo con alimentos saludables y chatarra en una cocina.
-![Gameplay](./imagenes/comida2.png)
+![Gameplay](/imagenes/comida2.png)
 3. **Resultado:** Pantalla de victoria tras completar las 5 rondas.
-![Resultado](./imagenes/comida3.png)
+![Resultado](/imagenes/comida3.png)

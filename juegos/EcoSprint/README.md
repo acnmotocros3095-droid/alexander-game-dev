@@ -16,8 +16,8 @@ Puzzle / Arcade de gestión de tiempo.
 
 ## Capturas de pantalla
 1. **Pantalla inicial:** Selección de nivel de dificultad.
-![Pantalla inicial](./imagenes/basura1.png)
+![Pantalla inicial](/imagenes/basura1.png)
 2. **Gameplay:** Cinta transportadora con residuos y contenedores de reciclaje.
-![Gameplay](./imagenes/basura2.png)
+![Gameplay](/imagenes/basura2.png)
 3. **Resultado:** Pantalla de victoria tras superar todas las rondas.
-![Resultado](./imagenes/basura3.png)   
+![Resultado](/imagenes/basura3.png)   
