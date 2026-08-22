@@ -138,7 +138,7 @@ El jugador se enfrenta a diferentes situaciones digitales y debe tomar decisione
 | | |
 |:--|:--|
 | 📂 **Proyecto** | 🔗 [Ver documentación](./juegos/CyberJuego/) |
-| ▶️ **Juego** | 🎮 [Jugar Cyber Shift](./juegos/CyberJuego/index.html) |
+| ▶️ **Juego** | 🎮 [Jugar Cyber Shift](https://acnmotocros3095-droid.github.io/alexander-game-dev/juegos/CyberJuego/index.html) |
 
 ---
 
@@ -169,7 +169,7 @@ El jugador deberá enfrentarse a diferentes desafíos mientras toma decisiones r
 | | |
 |:--|:--|
 | 📂 **Proyecto** | 🔗 [Ver documentación](./juegos/EcoSprint/) |
-| ▶️ **Juego** | 🎮 [Jugar Eco Sprint](./juegos/EcoSprint/index.html) |
+| ▶️ **Juego** | 🎮 [Jugar Eco Sprint](https://acnmotocros3095-droid.github.io/alexander-game-dev/juegos/EcoSprint/index.html) |
 
 ---
 
@@ -200,7 +200,7 @@ El jugador deberá enfrentarse a diferentes situaciones y decidir cómo utilizar
 | | |
 |:--|:--|
 | 📂 **Proyecto** | 🔗 [Ver documentación](./juegos/Salva-tu-Dinero/) |
-| ▶️ **Juego** | 🎮 [Jugar Salva tu Dinero](./juegos/Salva-tu-Dinero/index.html) |
+| ▶️ **Juego** | 🎮 [Jugar Salva tu Dinero](https://acnmotocros3095-droid.github.io/alexander-game-dev/juegos/Salva-tu-Dinero/index.html) |
 
 ---
 
@@ -231,7 +231,7 @@ El jugador debe resolver diferentes ejercicios para avanzar y superar los desaf�
 | | |
 |:--|:--|
 | 📂 **Proyecto** | 🔗 [Ver documentación](./juegos/Super-Math-world/) |
-| ▶️ **Juego** | 🎮 [Jugar Super Math World](./juegos/Super-Math-world/index.html) |
+| ▶️ **Juego** | 🎮 [Jugar Super Math World](https://acnmotocros3095-droid.github.io/alexander-game-dev/juegos/Super-Math-world/index.html) |
 
 ---
 
@@ -262,7 +262,7 @@ El jugador deberá superar desafíos relacionados con la protección de este rec
 | | |
 |:--|:--|
 | 📂 **Proyecto** | 🔗 [Ver documentación](./juegos/Yaka-Rush/) |
-| ▶️ **Juego** | 🎮 [Jugar Yaka Rush Agua](./juegos/Yaka-Rush/index.html) |
+| ▶️ **Juego** | 🎮 [Jugar Yaka Rush Agua](https://acnmotocros3095-droid.github.io/alexander-game-dev/juegos/Yaka-Rush/index.html) |
 
 ---
 
@@ -293,7 +293,7 @@ El jugador interactúa con diferentes alimentos y deberá tomar decisiones para 
 | | |
 |:--|:--|
 | 📂 **Proyecto** | 🔗 [Ver documentación](./juegos/Chef-Saludable/) |
-| ▶️ **Juego** | 🎮 [Jugar Chef Saludable](./juegos/Chef-Saludable/index.html) |
+| ▶️ **Juego** | 🎮 [Jugar Chef Saludable](https://acnmotocros3095-droid.github.io/alexander-game-dev/juegos/Chef-Saludable/index.html) |
 
 ---
 
