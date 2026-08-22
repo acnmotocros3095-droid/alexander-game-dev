@@ -16,8 +16,8 @@ Strategy / Gestión de Recursos.
 
 ## Capturas de pantalla
 1. **Pantalla inicial:** Dashboard con el estado del tanque de agua y estadísticas de consumo.
-![Pantalla inicial](imagenes/agua1.png)
+![Pantalla inicial](./imagenes/agua1.png)
 2. **Gameplay:** Escenario de la vivienda mostrando zonas con fugas activas.
-![Gameplay](imagenes/agua2.png)
+![Gameplay](./imagenes/agua2.png)
 3. **Victoria/Derrota:** Resumen de agua ahorrada o mensaje de desabastecimiento.
-![Victoria/Derrota](imagenes/agua3.png)
+![Victoria/Derrota](./imagenes/agua3.png)

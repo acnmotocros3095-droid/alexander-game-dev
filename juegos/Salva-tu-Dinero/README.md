@@ -16,8 +16,8 @@ Puzzle / Arcade de gestión de recursos.
 
 ## Capturas de pantalla
 1. **Pantalla Inicial:** Menú con selección de dificultad y estilo retro-futurista.
-![Pantalla inicial](imagenes/dinero1.png)
+![Pantalla inicial](./imagenes/dinero1.png)
 2. **Gameplay:** Bloques de gastos cayendo sobre los tres contenedores de prioridad.
-![Gameplay](imagenes/dinero2.png)
+![Gameplay](./imagenes/dinero2.png)
 3. **Victoria/Derrota:** Pantalla de "Bancarrota" o "Meta Alcanzada" al finalizar el nivel 12.
-![Victoria/Derrota](imagenes/dinero3.png)
+![Victoria/Derrota](./imagenes/dinero3.png)

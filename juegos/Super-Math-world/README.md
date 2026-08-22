@@ -15,8 +15,8 @@ Arcade / Educativo.
 
 ## Capturas de pantalla
 1. **Mapa del mundo:** Camino con 10 casillas y castillo final.
-![Mapa del mundo](imagenes/mario1.png)
+![Mapa del mundo](./imagenes/mario1.png)
 2. **Gameplay:** Ventana modal con ejercicio aritmético y 4 alternativas.
-![Gameplay](imagenes/mario2.png)
+![Gameplay](./imagenes/mario2.png)
 3. **Resultado:** Pantalla final con puntuación sobre 10.
-![Resultado](imagenes/mario3.png)
+![Resultado](./imagenes/mario3.png)
