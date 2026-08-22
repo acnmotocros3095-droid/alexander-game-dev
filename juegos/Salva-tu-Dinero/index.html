@@ -1,0 +1,2307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salva tu Dinero — Tetris Financiero</title>
+
+<style>
+:root{
+  --bg:#050b07;
+  --panel:#0b1710;
+  --line:#53ff70;
+  --text:#e2ffe7;
+  --green:#35e46b;
+  --yellow:#ffd34d;
+  --red:#ff5364;
+  --cyan:#54eaff;
+  --purple:#b08cff;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 50% -10%,rgba(60,255,100,.12),transparent 36%),
+    linear-gradient(180deg,#061008,#020402 75%);
+  color:var(--text);
+  font-family:Consolas,Monaco,monospace;
+  overflow-x:hidden;
+}
+
+button{
+  font:inherit;
+}
+
+.app{
+  width:min(1450px,96vw);
+  margin:14px auto 28px;
+}
+
+.header{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:18px;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.logo h1{
+  font-size:clamp(28px,4vw,52px);
+  margin:0;
+  color:#8dff6b;
+  text-shadow:0 0 16px rgba(141,255,107,.5);
+  letter-spacing:2px;
+}
+
+.logo p{
+  margin:5px 0 0;
+  color:#88d995;
+  font-size:14px;
+}
+
+.status{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.pill{
+  border:1px solid #1a4d29;
+  background:#0a1710;
+  padding:8px 12px;
+  border-radius:999px;
+}
+
+.pill b{color:white}
+
+.layout{
+  display:grid;
+  grid-template-columns:290px minmax(600px,1fr) 290px;
+  gap:12px;
+}
+
+.panel{
+  background:linear-gradient(180deg,rgba(13,29,20,.98),rgba(6,15,10,.98));
+  border:1px solid #286e39;
+  border-radius:16px;
+  box-shadow:0 0 24px rgba(0,0,0,.35);
+  padding:14px;
+}
+
+.panel h2{
+  font-size:15px;
+  color:#9cff8f;
+  margin:0 0 12px;
+  letter-spacing:1px;
+}
+
+.stat{margin:10px 0 14px}
+
+.stat-head{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:#a4d8ad;
+  margin-bottom:6px;
+}
+
+.bar{
+  height:11px;
+  background:#031006;
+  border:1px solid #1e4e2a;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.fill{
+  height:100%;
+  width:0%;
+  transition:width .3s ease;
+}
+
+#saveFill{background:linear-gradient(90deg,#24d84f,#d7ff5a)}
+#debtFill{background:linear-gradient(90deg,#ff7d49,#ff334b)}
+#stressFill{background:linear-gradient(90deg,#4adfff,#ff6cbd)}
+#comboFill{background:linear-gradient(90deg,#a27cff,#ff7df3)}
+
+.cards{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.mini{
+  padding:10px;
+  border:1px solid #214f2b;
+  border-radius:10px;
+  background:#07130b;
+}
+
+.mini span{
+  display:block;
+  color:#86af8d;
+  font-size:11px;
+}
+
+.mini b{
+  display:block;
+  margin-top:2px;
+  font-size:16px;
+  color:#f2fff4;
+}
+
+.tipBox{
+  font-size:12px;
+  line-height:1.5;
+  color:#bdecc6;
+  min-height:125px;
+}
+
+.instructions{
+  font-size:12px;
+  line-height:1.55;
+  color:#a8d8b1;
+}
+
+.kbd{
+  border:1px solid #376a42;
+  background:#0a160d;
+  padding:2px 6px;
+  border-radius:5px;
+  color:#fff;
+}
+
+.controls{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:10px;
+}
+
+.controls button,.main-btn{
+  border:1px solid #286e39;
+  background:#0a1810;
+  color:#dfffe5;
+  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+  transition:.15s;
+}
+
+.controls button:hover,.main-btn:hover{
+  transform:translateY(-2px);
+  border-color:#7bff86;
+  background:#102417;
+}
+
+.main-btn{
+  width:100%;
+  margin-top:8px;
+  font-weight:800;
+}
+
+.danger-btn{
+  border-color:#8b3945!important;
+  color:#ffbac2!important;
+}
+
+.special-btn{
+  border-color:#6c4fbb!important;
+  color:#e2d6ff!important;
+}
+
+.event{
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #765e20;
+  background:rgba(96,74,18,.12);
+  font-size:12px;
+  line-height:1.45;
+  color:#ffe8a0;
+}
+
+.event strong{color:#fff07b}
+
+.game-shell{
+  position:relative;
+  padding:10px;
+}
+
+.canvas-wrap{
+  position:relative;
+  border:2px solid #266c37;
+  border-radius:16px;
+  background:#020803;
+  overflow:hidden;
+  box-shadow:0 0 30px rgba(42,255,81,.08);
+}
+
+canvas{
+  display:block;
+  width:100%;
+  height:auto;
+  background:linear-gradient(180deg,#031107,#04110a);
+}
+
+.hud-top{
+  position:absolute;
+  left:14px;
+  right:14px;
+  top:12px;
+  display:flex;
+  justify-content:space-between;
+  pointer-events:none;
+  font-size:12px;
+  text-shadow:0 0 8px #000;
+}
+
+.hud-top .box{
+  background:rgba(4,11,7,.82);
+  padding:7px 10px;
+  border:1px solid #1b4e27;
+  border-radius:8px;
+}
+
+.legend{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+  font-size:11px;
+  color:#93be9a;
+}
+
+.dot{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  margin-right:5px;
+  vertical-align:middle;
+}
+
+.g{background:var(--green)}
+.y{background:var(--yellow)}
+.r{background:var(--red)}
+
+.container-info{
+  margin-top:10px;
+  display:grid;
+  gap:8px;
+}
+
+.container-card{
+  border:1px solid #254f2d;
+  border-radius:10px;
+  padding:9px;
+  background:#08140b;
+}
+
+.container-card b{
+  display:block;
+  font-size:12px;
+}
+
+.container-card small{color:#8fb796}
+
+.overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(2,7,4,.9);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  z-index:5;
+}
+
+.overlay.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.modal{
+  width:min(620px,92%);
+  border:2px solid #68ff78;
+  background:#061009;
+  padding:24px;
+  border-radius:16px;
+  text-align:center;
+  box-shadow:0 0 40px rgba(58,255,95,.18);
+}
+
+.modal h3{
+  font-size:34px;
+  margin:0 0 8px;
+  color:#9eff8f;
+}
+
+.modal p{
+  color:#c1edc8;
+  line-height:1.55;
+}
+
+.modal .big{
+  font-size:20px;
+  color:#fff;
+  margin:12px 0;
+}
+
+.difficulty-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:18px 0 10px;
+}
+
+.diff-btn{
+  border:2px solid #244b2c;
+  background:#07120b;
+  color:#eaffed;
+  padding:14px 8px;
+  border-radius:12px;
+  cursor:pointer;
+  transition:.18s;
+  min-height:108px;
+}
+
+.diff-btn:hover{
+  transform:translateY(-2px);
+  border-color:#73ff85;
+}
+
+.diff-btn.selected{
+  box-shadow:0 0 18px rgba(91,255,112,.16);
+  border-color:#78ff8a;
+  background:#102216;
+}
+
+.diff-btn b{
+  display:block;
+  font-size:16px;
+  margin-bottom:7px;
+}
+
+.diff-btn small{
+  display:block;
+  color:#8db995;
+  line-height:1.4;
+}
+
+.diff-facil b{color:#60ff86}
+.diff-medio b{color:#ffe36c}
+.diff-dificil b{color:#ff6b78}
+
+.difficulty-note{
+  font-size:11px!important;
+  color:#90b79a!important;
+  margin:7px 0 14px!important;
+}
+
+.modal .row{
+  display:flex;
+  gap:8px;
+}
+
+.modal .row button{flex:1}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:26px;
+  transform:translateX(-50%) translateY(18px);
+  background:#07130b;
+  border:1px solid #4eff70;
+  padding:12px 16px;
+  border-radius:12px;
+  box-shadow:0 0 24px rgba(98,255,116,.16);
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  z-index:30;
+  max-width:min(720px,92vw);
+  text-align:center;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+.footer{
+  text-align:center;
+  color:#557b5e;
+  font-size:11px;
+  padding:12px 0 0;
+}
+
+@media(max-width:1100px){
+  .layout{grid-template-columns:1fr}
+  .panel.side{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .header{grid-template-columns:1fr}
+  .status{justify-content:flex-start}
+}
+
+@media(max-width:700px){
+  .panel.side{display:block}
+  .app{width:98vw}
+  .logo h1{font-size:28px}
+  .difficulty-grid{grid-template-columns:1fr}
+  .modal{padding:18px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <div class="logo">
+      <h1>💰 SALVA TU DINERO</h1>
+      <p>TETRIS FINANCIERO · ORGANIZA · PRIORIRIZA · AHORRA</p>
+    </div>
+
+    <div class="status">
+      <div class="pill">DIFICULTAD <b id="difficultyTxt">—</b></div>
+      <div class="pill">MES <b id="monthTxt">ENERO</b></div>
+      <div class="pill">NIVEL <b id="levelTxt">1</b>/12</div>
+      <div class="pill">PUNTAJE <b id="scoreTxt">0</b></div>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- IZQUIERDA -->
+    <aside class="panel side">
+
+      <section>
+        <h2>📊 ESTADO FINANCIERO</h2>
+
+        <div class="stat">
+          <div class="stat-head">
+            <span>AHORRO / INVERSIÓN</span>
+            <b id="saveTxt">8%</b>
+          </div>
+          <div class="bar"><div id="saveFill" class="fill"></div></div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-head">
+            <span>DEUDA</span>
+            <b id="debtTxt">0%</b>
+          </div>
+          <div class="bar"><div id="debtFill" class="fill"></div></div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-head">
+            <span>ESTRÉS</span>
+            <b id="stressTxt">10%</b>
+          </div>
+          <div class="bar"><div id="stressFill" class="fill"></div></div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-head">
+            <span>COMBO</span>
+            <b id="comboTxt">x0</b>
+          </div>
+          <div class="bar"><div id="comboFill" class="fill"></div></div>
+        </div>
+
+        <div class="cards">
+          <div class="mini"><span>PRESUPUESTO</span><b id="budgetTxt">$1,500</b></div>
+          <div class="mini"><span>GASTADO</span><b id="spentTxt">$0</b></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>🎯 CONTROLES</h2>
+        <div class="instructions">
+          <span class="kbd">←</span>
+          <span class="kbd">→</span>
+          mover ·
+          <span class="kbd">↓</span>
+          acelerar ·
+          <span class="kbd">ESPACIO</span>
+          soltar ·
+          <span class="kbd">X</span>
+          girar ·
+          <span class="kbd">P</span>
+          pausar.
+        </div>
+
+        <div class="legend">
+          <span><i class="dot" style="background:#35a7ff"></i>Necesario · bolita azul → caja verde</span>
+          <span><i class="dot" style="background:#b77cff"></i>Casi necesario · bolita violeta → caja amarilla</span>
+          <span><i class="dot" style="background:#ff9d4d"></i>Innecesario · bolita naranja → caja roja</span>
+        </div>
+      </section>
+
+      <section>
+        <button id="autoBtn" class="main-btn special-btn">🧠 AUTOCONTROL × 2</button>
+        <button id="pauseBtn" class="main-btn">⏸️ PAUSAR</button>
+        <button id="restartBtn" class="main-btn danger-btn">↻ REINICIAR</button>
+      </section>
+
+      <section>
+        <h2>💡 CONSEJO ACTUAL</h2>
+        <div id="tipBox" class="tipBox">
+          Empieza con calma: tienes bastante tiempo para observar el color y elegir el contenedor correcto.
+        </div>
+      </section>
+
+    </aside>
+
+    <!-- JUEGO -->
+    <main class="panel game-shell">
+
+      <div class="canvas-wrap">
+
+        <canvas id="game" width="860" height="920"></canvas>
+
+        <div class="hud-top">
+          <div class="box">PRESUPUESTO: <b id="budgetHud">$1,500</b></div>
+          <div class="box">SIGUIENTE: <b id="nextHud">—</b></div>
+        </div>
+
+        <div id="overlay" class="overlay">
+
+          <div class="modal">
+
+            <h3 id="modalTitle">💰 SALVA TU DINERO</h3>
+
+            <div id="modalText" class="big">
+              Elige tu dificultad
+            </div>
+
+            <p id="modalSub">
+              La dificultad define la velocidad inicial y cuánto aumentará la velocidad al avanzar de nivel.
+            </p>
+
+            <div class="difficulty-grid">
+
+              <button class="diff-btn diff-facil" data-diff="facil">
+                <b>🟢 FÁCIL</b>
+                <small>
+                  Caída tranquila.<br>
+                  Ideal para aprender.
+                </small>
+              </button>
+
+              <button class="diff-btn diff-medio selected" data-diff="medio">
+                <b>🟡 MEDIO</b>
+                <small>
+                  Ritmo equilibrado.<br>
+                  Requiere más atención.
+                </small>
+              </button>
+
+              <button class="diff-btn diff-dificil" data-diff="dificil">
+                <b>🔴 DIFÍCIL</b>
+                <small>
+                  Más rápido.<br>
+                  Pero con límite justo.
+                </small>
+              </button>
+
+            </div>
+
+            <p class="difficulty-note">
+              La velocidad aumenta poco a poco con cada nivel y tiene un límite para mantener la partida jugable.
+            </p>
+
+            <div class="row">
+              <button class="main-btn" id="startBtn">▶ JUGAR</button>
+              <button class="main-btn special-btn" id="howBtn">❔ CÓMO JUGAR</button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="event">
+        <strong id="eventName">EVENTO: TRANQUILO</strong>
+        <div id="eventDesc">Controla tus gastos y mantén el equilibrio.</div>
+      </div>
+
+      <div class="legend">
+        <span><i class="dot" style="background:#35a7ff"></i>AZUL → caja verde: NECESARIOS</span>
+        <span><i class="dot" style="background:#b77cff"></i>VIOLETA → caja amarilla: CASI NECESARIOS</span>
+        <span><i class="dot" style="background:#ff9d4d"></i>NARANJA → caja roja: INNECESARIOS</span>
+      </div>
+
+    </main>
+
+    <!-- DERECHA -->
+    <aside class="panel side">
+
+      <section>
+        <h2>📦 TUS CONTENEDORES</h2>
+
+        <div class="container-info">
+          <div class="container-card">
+            <b style="color:#66ff7a">🟢 CAJA NECESARIOS</b>
+            <small>Vivienda, comida, transporte, salud y educación.</small>
+          </div>
+
+          <div class="container-card">
+            <b style="color:#ffe36b">🟡 CAJA CASI NECESARIOS</b>
+            <small>Cosas útiles, pero que puedes controlar.</small>
+          </div>
+
+          <div class="container-card">
+            <b style="color:#ff6b78">🔴 CAJA INNECESARIOS</b>
+            <small>Compras impulsivas, caprichos y ocio.</small>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>⚡ EVENTOS</h2>
+        <div class="instructions">
+          <b>📈 Inflación:</b> los gastos necesarios se vuelven más grandes.
+          <br><br>
+          <b>🛍️ Viernes Negro:</b> aparecen gastos rojos más rápido.
+        </div>
+      </section>
+
+      <section>
+        <h2>🏆 META</h2>
+        <div class="instructions">
+          Supera los <b>12 meses</b>, controla la deuda y consigue una economía saludable.
+        </div>
+      </section>
+
+      <section>
+        <h2>🔥 BONUS</h2>
+        <div class="instructions">
+          Encadena decisiones correctas para conseguir combos y más puntos.
+          <br><br>
+          Usa <b>Autocontrol</b> para destruir una bolita roja.
+        </div>
+      </section>
+
+    </aside>
+
+  </div>
+
+  <div class="footer">
+    Juego educativo · Aprende a priorizar tus gastos y construir mejores hábitos financieros.
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+(() => {
+"use strict";
+
+/* =========================================================
+   REFERENCIAS
+========================================================= */
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const W = canvas.width;
+const H = canvas.height;
+
+const MONTHS = [
+  "ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO",
+  "JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"
+];
+
+const COLORS = {
+  green:"#35e46b",
+  yellow:"#ffd34d",
+  red:"#ff5364",
+  cyan:"#54eaff",
+
+  // Colores exclusivos para las bolitas.
+  ballBlue:"#35a7ff",
+  ballPurple:"#b77cff",
+  ballOrange:"#ff9d4d"
+};
+
+const CATEGORY = {
+  green:{
+    name:"NECESARIO",
+    color:COLORS.ballBlue,
+    containerColor:COLORS.green,
+    labels:[
+      "Alquiler","Comida","Transporte","Medicinas","Consulta médica",
+      "Matrícula","Libros","Internet","Electricidad","Agua",
+      "Gas","Celular","Seguro médico","Material escolar","Pasaje",
+      "Combustible","Higiene personal"
+    ]
+  },
+  yellow:{
+    name:"CASI NECESARIO",
+    color:COLORS.ballPurple,
+    containerColor:COLORS.yellow,
+    labels:[
+      "Ropa","Peluquería","Café","Delivery","Suscripción",
+      "Zapatos","Gimnasio","Accesorio","Cine","Salida",
+      "Perfume","Barbería","Streaming","Decoración simple","Restaurante",
+      "Mochila nueva","Auriculares"
+    ]
+  },
+  red:{
+    name:"INNECESARIO",
+    color:COLORS.ballOrange,
+    containerColor:COLORS.red,
+    labels:[
+      "Videojuego","Snack","Gadget","Capricho","Compra impulsiva",
+      "Juguete","Postre extra","Ropa por moda","Compra online",
+      "Gasto por tendencia","Coleccionable","Skin de videojuego",
+      "Artículo viral","Accesorio repetido","Comida por antojo",
+      "Compra duplicada"
+    ]
+  }
+};
+
+const TIPS = [
+  "💡 Paga primero vivienda, comida, salud y transporte antes de pensar en caprichos.",
+  "💡 Un pequeño gasto repetido muchas veces puede convertirse en una gran fuga de dinero.",
+  "💡 Antes de comprar por impulso, pregúntate: ¿lo necesito o solo lo quiero ahora?",
+  "💡 Reserva una parte de tus ingresos para ahorro antes de empezar a gastar.",
+  "💡 Las ofertas no siempre son ahorro: comprar algo innecesario sigue siendo gastar.",
+  "💡 Compara precios y evita pagar más solo por comprar rápido.",
+  "💡 Tener un presupuesto te ayuda a decidir antes de que el dinero desaparezca.",
+  "💡 Una suscripción que casi no usas puede ser dinero que podrías ahorrar.",
+  "💡 El ahorro sirve para convertir una meta grande en pasos pequeños y constantes.",
+  "💡 Controlar tus impulsos hoy puede darte más libertad financiera mañana."
+];
+
+/* =========================================================
+   DIFICULTADES
+   La primera cifra es el intervalo de caída.
+   Menor intervalo = más rápido.
+========================================================= */
+
+const DIFFICULTIES = {
+  facil:{
+    label:"FÁCIL",
+    fallSpeed:108,
+    fallIncrease:4,
+    maxFallSpeed:145,
+    spawnInterval:1700,
+    spawnDecrease:35,
+    minSpawnInterval:1150,
+    blackFridayFallMultiplier:1.10,
+    blackFridaySpawnMultiplier:0.82
+  },
+  medio:{
+    label:"MEDIO",
+    fallSpeed:132,
+    fallIncrease:5,
+    maxFallSpeed:170,
+    spawnInterval:1450,
+    spawnDecrease:45,
+    minSpawnInterval:900,
+    blackFridayFallMultiplier:1.14,
+    blackFridaySpawnMultiplier:0.76
+  },
+  dificil:{
+    label:"DIFÍCIL",
+    fallSpeed:155,
+    fallIncrease:6,
+    maxFallSpeed:195,
+    spawnInterval:1200,
+    spawnDecrease:48,
+    minSpawnInterval:760,
+    blackFridayFallMultiplier:1.18,
+    blackFridaySpawnMultiplier:0.70
+  }
+};
+
+let selectedDifficulty = "medio";
+let state;
+let lastTime = 0;
+let raf = 0;
+let audioCtx = null;
+
+/* =========================================================
+   ESTADO
+========================================================= */
+
+function resetState(){
+
+  state = {
+    running:false,
+    paused:false,
+    gameOver:false,
+    victory:false,
+
+    difficulty:selectedDifficulty,
+
+    month:0,
+    score:0,
+
+    save:8,
+    debt:0,
+    stress:10,
+
+    combo:0,
+    maxCombo:0,
+
+    budget:1500,
+    spent:0,
+
+    auto:2,
+
+    dropTimer:0,
+    spawnTimer:0,
+
+    neededTarget:6,
+    neededPlaced:0,
+
+    monthBalls:0,
+    monthLimit:16,
+
+    event:null,
+    eventTimer:0,
+
+    flash:0,
+    screenShake:0,
+
+    current:null,
+    next:null,
+
+    particles:[],
+    floats:[]
+  };
+
+  chooseNext();
+  updateUI();
+  draw();
+}
+
+/* =========================================================
+   OBTENER CONFIGURACIÓN
+========================================================= */
+
+function difficultyConfig(){
+  return DIFFICULTIES[state.difficulty];
+}
+
+function currentFallSpeed(){
+  const cfg = difficultyConfig();
+
+  let speed =
+    cfg.fallSpeed +
+    state.month * cfg.fallIncrease;
+
+  speed = Math.min(speed, cfg.maxFallSpeed);
+
+  if(state.event === "blackfriday"){
+    speed *= cfg.blackFridayFallMultiplier;
+  }
+
+  return speed;
+}
+
+/* =========================================================
+   INICIAR
+========================================================= */
+
+function startGame(){
+
+  resetState();
+
+  state.running = true;
+
+  state.paused = false;
+
+  state.current = createBall();
+
+  chooseNext();
+
+  hideOverlay();
+
+  toast(
+    "🎮 Dificultad " +
+    difficultyConfig().label +
+    " · Nivel 1 · ¡Comenzamos!"
+  );
+
+  playTone(440,.08,"sine");
+
+  lastTime = performance.now();
+
+  cancelAnimationFrame(raf);
+
+  raf = requestAnimationFrame(loop);
+}
+
+/* =========================================================
+   SIGUIENTE MES
+========================================================= */
+
+function nextMonth(){
+
+  if(state.month >= 11){
+
+    state.running = false;
+    state.victory = true;
+
+    state.save = Math.min(100,state.save + 12);
+
+    updateUI();
+
+    showEndModal(
+      "🏆 ¡VICTORIA!",
+      "SUPERASTE LOS 12 MESES",
+      "Llegaste a diciembre con tus finanzas bajo control. Ahorro final: " +
+      Math.round(state.save) + "%.",
+      "JUGAR DE NUEVO"
+    );
+
+    playTone(880,.12,"triangle");
+
+    setTimeout(
+      () => playTone(1100,.15,"triangle"),
+      100
+    );
+
+    return;
+  }
+
+  state.month++;
+
+  state.budget =
+    Math.round(
+      1500 +
+      state.month * 130 +
+      Math.random() * 220
+    );
+
+  state.spent = 0;
+  state.neededPlaced = 0;
+  state.monthBalls = 0;
+  state.neededTarget = Math.min(11,6 + Math.floor(state.month/2));
+  state.monthLimit = 16 + state.month * 2;
+
+  state.event = null;
+  state.eventTimer = 0;
+
+  state.save = Math.min(100,state.save + 3);
+  state.stress = Math.max(4,state.stress - 4);
+
+  chooseNext();
+  state.current = createBall();
+
+  maybeTriggerEvent();
+
+  updateUI();
+
+  toast("📅 NUEVO MES: " + MONTHS[state.month]);
+
+  playTone(660,.08,"square");
+}
+
+/* =========================================================
+   EVENTOS ALEATORIOS
+========================================================= */
+
+function maybeTriggerEvent(){
+
+  const chance =
+    0.18 +
+    state.month * 0.018;
+
+  if(Math.random() < chance){
+
+    triggerEvent(
+      Math.random() < .52
+        ? "inflation"
+        : "blackfriday"
+    );
+  }
+}
+
+function triggerEvent(type){
+
+  state.event = type;
+
+  state.eventTimer =
+    type === "inflation"
+      ? 9000
+      : 6500;
+
+  if(type === "inflation"){
+    toast("📈 INFLACIÓN: los necesarios vienen más grandes.");
+  }else{
+    toast("🛍️ VIERNES NEGRO: los rojos caen más rápido.");
+  }
+}
+
+/* =========================================================
+   CATEGORÍA
+========================================================= */
+
+function randomCategory(){
+
+  const r = Math.random();
+
+  if(r < .48) return "green";
+  if(r < .78) return "yellow";
+  return "red";
+}
+
+/* =========================================================
+   CREAR BOLITA
+========================================================= */
+
+function currentSpawnInterval(){
+  const cfg = difficultyConfig();
+
+  let interval =
+    cfg.spawnInterval -
+    state.month * cfg.spawnDecrease;
+
+  interval = Math.max(
+    cfg.minSpawnInterval,
+    interval
+  );
+
+  if(state.event === "blackfriday"){
+    interval *= cfg.blackFridaySpawnMultiplier;
+  }
+
+  return interval;
+}
+
+function createBall(){
+
+  const type = randomCategory();
+  const cat = CATEGORY[type];
+
+  let base;
+
+  if(type === "green") base = 80;
+  else if(type === "yellow") base = 45;
+  else base = 25;
+
+  const value =
+    Math.round(
+      (
+        base +
+        Math.random() * base * 1.35
+      ) / 5
+    ) * 5;
+
+  const radius =
+    20 + Math.min(13,value/20);
+
+  return {
+    type,
+    label:
+      cat.labels[
+        Math.floor(
+          Math.random()*cat.labels.length
+        )
+      ],
+    value,
+    radius,
+    x:W/2,
+    y:135,
+    vy:0,
+    rot:0
+  };
+}
+
+function chooseNext(){
+  state.next = createBall();
+}
+
+/* =========================================================
+   MOVIMIENTO
+========================================================= */
+
+function moveBall(dx){
+
+  if(!state.current || !state.running || state.paused) return;
+
+  state.current.x += dx;
+  clampBall();
+}
+
+function clampBall(){
+
+  const b = state.current;
+  if(!b) return;
+
+  b.x =
+    Math.max(
+      b.radius + 10,
+      Math.min(
+        W - b.radius - 10,
+        b.x
+      )
+    );
+}
+
+function rotateBall(){
+
+  if(state.current && state.running && !state.paused){
+    state.current.rot += Math.PI/2;
+    toast("🔄 Giraste la bolita.");
+  }
+}
+
+function dropToBottom(){
+
+  if(!state.current || !state.running || state.paused) return;
+
+  state.current.vy = 115;
+}
+
+/* =========================================================
+   AUTOCONTROL
+========================================================= */
+
+function autoControl(){
+
+  if(state.auto <= 0){
+    toast("⚠️ Ya no tienes Autocontrol.");
+    return;
+  }
+
+  if(!state.current || !state.running || state.paused){
+    return;
+  }
+
+  if(state.current.type !== "red"){
+    toast("🧠 Usa Autocontrol sobre una bolita roja.");
+    return;
+  }
+
+  state.auto--;
+
+  addParticles(
+    state.current.x,
+    state.current.y,
+    COLORS.red,
+    24
+  );
+
+  addFloat(
+    state.current.x,
+    state.current.y - 12,
+    "¡IMPULSO ELIMINADO!",
+    "good"
+  );
+
+  playTone(720,.08,"triangle");
+
+  state.current = createBall();
+  chooseNext();
+
+  updateUI();
+}
+
+/* =========================================================
+   ATERRIZAJE
+========================================================= */
+
+function landBall(){
+
+  const b = state.current;
+  if(!b) return;
+
+  let zone;
+
+  if(b.x < W/3){
+    zone = "green";
+  }else if(b.x < W*2/3){
+    zone = "yellow";
+  }else{
+    zone = "red";
+  }
+
+  const correct = zone === b.type;
+
+  addParticles(
+    b.x,
+    b.y,
+    CATEGORY[b.type].color,
+    correct ? 16 : 24
+  );
+
+  state.monthBalls++;
+
+  if(correct){
+
+    state.combo++;
+    state.maxCombo = Math.max(state.maxCombo,state.combo);
+
+    state.score += 100 + state.combo*15;
+
+    state.stress =
+      Math.max(
+        0,
+        state.stress - 2
+      );
+
+    state.spent += b.value;
+
+    if(b.type === "green"){
+      state.neededPlaced++;
+      state.save = Math.min(100,state.save + .8);
+    }else if(b.type === "yellow"){
+      state.save = Math.max(0,state.save - .2);
+    }else{
+      state.save = Math.max(0,state.save - 1.1);
+    }
+
+    addFloat(
+      b.x,
+      b.y - 30,
+      "+" + (100 + state.combo*15),
+      "good"
+    );
+
+    toast(
+      "✅ Correcto · $" +
+      b.value +
+      " · Combo x" +
+      state.combo
+    );
+
+    playTone(
+      520 + Math.min(300,state.combo*18),
+      .055,
+      "sine"
+    );
+
+  }else{
+
+    state.combo = 0;
+
+    state.debt += zone === "green" ? 8 : 5;
+
+    state.stress += zone === "green" ? 7 : 5;
+
+    state.spent += Math.round(b.value*.7);
+
+    const tip =
+      TIPS[
+        Math.floor(
+          Math.random()*TIPS.length
+        )
+      ];
+
+    document.getElementById("tipBox").innerHTML =
+      "<strong>💡 CONSEJO:</strong><br>" + tip;
+
+    addFloat(
+      b.x,
+      b.y - 30,
+      "¡ERROR!",
+      "bad"
+    );
+
+    toast(
+      "❌ Contenedor incorrecto · " + tip
+    );
+
+    playTone(190,.11,"square");
+
+    if(state.debt >= 100 || state.stress >= 100){
+      loseGame("Tu deuda o estrés llegaron al límite.");
+      return;
+    }
+  }
+
+  if(state.monthBalls >= state.monthLimit){
+    state.current = null;
+    setTimeout(endOfMonth,250);
+    return;
+  }
+
+  state.current = createBall();
+
+  if(
+    state.event === "blackfriday" &&
+    Math.random() < .42
+  ){
+
+    state.current.type = "red";
+
+    state.current.label =
+      CATEGORY.red.labels[
+        Math.floor(
+          Math.random()*CATEGORY.red.labels.length
+        )
+      ];
+
+    state.current.value =
+      Math.round(
+        (
+          15 + Math.random()*55
+        ) / 5
+      ) * 5;
+  }
+
+  chooseNext();
+
+  updateUI();
+}
+
+/* =========================================================
+   FIN DE MES
+========================================================= */
+
+function endOfMonth(){
+
+  const neededOk =
+    state.neededPlaced >= state.neededTarget;
+
+  if(!neededOk){
+
+    state.debt += 12;
+    state.stress += 13;
+    state.save = Math.max(0,state.save - 4);
+
+    toast(
+      "⚠️ Faltaron gastos necesarios este mes."
+    );
+
+    flash();
+
+  }else{
+
+    const bonus =
+      4 +
+      Math.min(
+        6,
+        Math.floor(state.combo/2)
+      );
+
+    state.save += bonus;
+    state.debt = Math.max(0,state.debt - 2);
+    state.stress = Math.max(0,state.stress - 3);
+
+    toast(
+      "✅ Mes superado · Ahorro +" +
+      bonus +
+      "%"
+    );
+  }
+
+  if(state.debt >= 100 || state.stress >= 100){
+    loseGame("Tu deuda o estrés llegaron al límite.");
+    return;
+  }
+
+  setTimeout(
+    () => nextMonth(),
+    900
+  );
+}
+
+/* =========================================================
+   DERROTA
+========================================================= */
+
+function loseGame(reason){
+
+  state.running = false;
+  state.gameOver = true;
+
+  updateUI();
+
+  showEndModal(
+    "💀 BANCARROTA",
+    reason,
+    "Tu objetivo era priorizar mejor los gastos y evitar llenar tu espacio financiero con decisiones costosas.",
+    "REINTENTAR"
+  );
+
+  playTone(150,.18,"sawtooth");
+}
+
+/* =========================================================
+   ACTUALIZAR UI
+========================================================= */
+
+function updateUI(){
+
+  document.getElementById("difficultyTxt").textContent =
+    DIFFICULTIES[selectedDifficulty].label;
+
+  document.getElementById("monthTxt").textContent =
+    MONTHS[state?.month ?? 0];
+
+  document.getElementById("levelTxt").textContent =
+    (state?.month ?? 0)+1;
+
+  document.getElementById("scoreTxt").textContent =
+    Math.floor(state?.score ?? 0);
+
+  document.getElementById("saveTxt").textContent =
+    Math.round(state?.save ?? 8) + "%";
+
+  document.getElementById("saveFill").style.width =
+    Math.min(100,state?.save ?? 8) + "%";
+
+  document.getElementById("debtTxt").textContent =
+    Math.round(state?.debt ?? 0) + "%";
+
+  document.getElementById("debtFill").style.width =
+    Math.min(100,state?.debt ?? 0) + "%";
+
+  document.getElementById("stressTxt").textContent =
+    Math.round(state?.stress ?? 10) + "%";
+
+  document.getElementById("stressFill").style.width =
+    Math.min(100,state?.stress ?? 10) + "%";
+
+  document.getElementById("comboTxt").textContent =
+    "x" + Math.floor(state?.combo ?? 0);
+
+  document.getElementById("comboFill").style.width =
+    Math.min(100,(state?.combo ?? 0)*10) + "%";
+
+  document.getElementById("budgetTxt").textContent =
+    "$" +
+    (state?.budget ?? 1500).toLocaleString("es-BO");
+
+  document.getElementById("spentTxt").textContent =
+    "$" +
+    Math.round(state?.spent ?? 0).toLocaleString("es-BO");
+
+  document.getElementById("budgetHud").textContent =
+    "$" +
+    (state?.budget ?? 1500).toLocaleString("es-BO");
+
+  document.getElementById("nextHud").textContent =
+    state?.next
+      ? CATEGORY[state.next.type].name + " $" + state.next.value
+      : "—";
+
+  document.getElementById("autoBtn").textContent =
+    "🧠 AUTOCONTROL × " + (state?.auto ?? 2);
+
+  document.getElementById("pauseBtn").textContent =
+    state?.paused ? "▶️ CONTINUAR" : "⏸️ PAUSAR";
+
+  let eventName = "EVENTO: TRANQUILO";
+  let eventDesc = "Controla tus gastos y mantén el equilibrio.";
+
+  if(state?.event === "inflation"){
+    eventName = "📈 EVENTO: INFLACIÓN";
+    eventDesc =
+      "Los gastos necesarios aumentan de tamaño durante unos segundos.";
+  }
+
+  if(state?.event === "blackfriday"){
+    eventName = "🛍️ EVENTO: VIERNES NEGRO";
+    eventDesc =
+      "Los gastos rojos aparecen y caen más rápido.";
+  }
+
+  document.getElementById("eventName").textContent = eventName;
+  document.getElementById("eventDesc").textContent = eventDesc;
+}
+
+/* =========================================================
+   MODALES
+========================================================= */
+
+function showEndModal(title,big,sub,buttonText){
+
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalText").textContent = big;
+  document.getElementById("modalSub").textContent = sub;
+
+  document.querySelector(".difficulty-grid").style.display = "none";
+  document.querySelector(".difficulty-note").style.display = "none";
+
+  document.getElementById("startBtn").textContent = buttonText;
+
+  document.getElementById("overlay").classList.add("show");
+}
+
+function showStartModal(){
+
+  document.getElementById("modalTitle").textContent =
+    "💰 SALVA TU DINERO";
+
+  document.getElementById("modalText").textContent =
+    "ELIGE TU DIFICULTAD";
+
+  document.getElementById("modalSub").textContent =
+    "FÁCIL es muy tranquilo, MEDIO es equilibrado y DIFÍCIL es rápido pero jugable. La velocidad aumenta suavemente con cada nivel.";
+
+  document.querySelector(".difficulty-grid").style.display = "grid";
+  document.querySelector(".difficulty-note").style.display = "block";
+
+  document.getElementById("startBtn").textContent =
+    "▶ JUGAR";
+
+  document.getElementById("overlay").classList.add("show");
+}
+
+function hideOverlay(){
+  document.getElementById("overlay").classList.remove("show");
+}
+
+/* =========================================================
+   CONSEJOS / TOAST
+========================================================= */
+
+function toast(text){
+
+  const el = document.getElementById("toast");
+
+  el.textContent = text;
+  el.classList.add("show");
+
+  clearTimeout(toast.t);
+
+  toast.t =
+    setTimeout(
+      () => el.classList.remove("show"),
+      3200
+    );
+}
+
+/* =========================================================
+   EFECTOS
+========================================================= */
+
+function flash(){
+  state.flash = 300;
+}
+
+function playTone(freq,dur,type="sine"){
+
+  try{
+
+    if(!audioCtx){
+      audioCtx =
+        new (
+          window.AudioContext ||
+          window.webkitAudioContext
+        )();
+    }
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = type;
+    osc.frequency.value = freq;
+
+    gain.gain.setValueAtTime(.035,audioCtx.currentTime);
+
+    gain.gain.exponentialRampToValueAtTime(
+      .001,
+      audioCtx.currentTime + dur
+    );
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+
+  }catch(e){}
+}
+
+/* =========================================================
+   DIBUJADO
+========================================================= */
+
+function draw(){
+
+  ctx.save();
+
+  if(state.screenShake > 0){
+    ctx.translate(
+      (Math.random()-.5)*5,
+      (Math.random()-.5)*5
+    );
+  }
+
+  ctx.clearRect(0,0,W,H);
+
+  drawBackground();
+  drawPlayArea();
+  drawContainers();
+
+  if(state.current){
+    drawBall(state.current);
+  }
+
+  drawParticles();
+  drawFloats();
+
+  if(state.flash > 0){
+
+    ctx.globalAlpha =
+      Math.min(.25,state.flash/300);
+
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0,0,W,H);
+
+    ctx.globalAlpha = 1;
+  }
+
+  ctx.restore();
+}
+
+function drawBackground(){
+
+  for(let y=0;y<H;y+=40){
+
+    ctx.strokeStyle = "rgba(91,255,117,.045)";
+
+    ctx.beginPath();
+    ctx.moveTo(0,y);
+    ctx.lineTo(W,y);
+    ctx.stroke();
+  }
+
+  for(let x=0;x<W;x+=40){
+
+    ctx.strokeStyle = "rgba(91,255,117,.045)";
+
+    ctx.beginPath();
+    ctx.moveTo(x,0);
+    ctx.lineTo(x,H);
+    ctx.stroke();
+  }
+
+  for(let i=0;i<40;i++){
+
+    const x=(i*97)%W;
+    const y=(i*47)%H;
+
+    ctx.fillStyle="rgba(110,255,130,.08)";
+    ctx.fillRect(x,y,2,2);
+  }
+}
+
+function drawPlayArea(){
+
+  ctx.fillStyle="rgba(4,15,8,.72)";
+  ctx.fillRect(18,72,W-36,H-250);
+
+  ctx.strokeStyle="rgba(75,255,104,.16)";
+  ctx.strokeRect(18,72,W-36,H-250);
+
+  ctx.fillStyle="#8be899";
+  ctx.font="700 13px Consolas";
+  ctx.textAlign="center";
+
+  ctx.fillText(
+    "ZONA DE CAÍDA · ELIGE EL CONTENEDOR CORRECTO",
+    W/2,
+    95
+  );
+
+  const speed = Math.round(currentFallSpeed());
+  const spawn = Math.round(currentSpawnInterval());
+
+  ctx.fillStyle="#72a87d";
+  ctx.font="11px Consolas";
+
+  ctx.fillText(
+    "CAÍDA " +
+    speed +
+    " px/s · APARICIÓN " +
+    spawn +
+    " ms · " +
+    DIFFICULTIES[state.difficulty].label +
+    " · NIVEL " +
+    (state.month+1),
+    W/2,
+    116
+  );
+}
+
+function drawContainers(){
+
+  const top=H-168;
+  const h=145;
+  const gap=12;
+  const x0=24;
+  const total=W-48;
+  const w=(total-gap*2)/3;
+
+  const zones=[
+    {
+      x:x0,
+      w,
+      color:COLORS.green,
+      title:"NECESARIOS",
+      sub:"OBLIGATORIOS",
+      icon:"🟢"
+    },
+    {
+      x:x0+w+gap,
+      w,
+      color:COLORS.yellow,
+      title:"CASI NECESARIOS",
+      sub:"IMPORTANTES",
+      icon:"🟡"
+    },
+    {
+      x:x0+(w+gap)*2,
+      w,
+      color:COLORS.red,
+      title:"INNECESARIOS",
+      sub:"EVITABLES",
+      icon:"🔴"
+    }
+  ];
+
+  zones.forEach(z=>{
+
+    const grd=ctx.createLinearGradient(
+      0,top,0,top+h
+    );
+
+    grd.addColorStop(0,hexAlpha(z.color,.12));
+    grd.addColorStop(1,hexAlpha(z.color,.03));
+
+    ctx.fillStyle=grd;
+    ctx.fillRect(z.x,top,z.w,h);
+
+    ctx.strokeStyle=z.color;
+    ctx.lineWidth=3;
+    ctx.strokeRect(z.x,top,z.w,h);
+
+    ctx.fillStyle=z.color;
+    ctx.font="900 17px Consolas";
+    ctx.textAlign="center";
+
+    ctx.fillText(
+      z.icon+" "+z.title,
+      z.x+z.w/2,
+      top+24
+    );
+
+    ctx.fillStyle="rgba(233,255,239,.7)";
+    ctx.font="11px Consolas";
+
+    ctx.fillText(
+      z.sub,
+      z.x+z.w/2,
+      top+41
+    );
+
+    ctx.strokeStyle="rgba(255,255,255,.1)";
+    ctx.strokeRect(
+      z.x+12,
+      top+55,
+      z.w-24,
+      h-72
+    );
+
+    ctx.fillStyle="rgba(255,255,255,.6)";
+    ctx.font="11px Consolas";
+
+    ctx.fillText(
+      "DEJA CAER AQUÍ",
+      z.x+z.w/2,
+      top+h-10
+    );
+  });
+}
+
+function drawBall(b){
+
+  const color=CATEGORY[b.type].color;
+
+  ctx.save();
+
+  ctx.translate(b.x,b.y);
+
+  const glow=ctx.createRadialGradient(
+    -b.radius*.3,
+    -b.radius*.35,
+    1,
+    0,0,
+    b.radius*1.3
+  );
+
+  glow.addColorStop(0,"rgba(255,255,255,.95)");
+  glow.addColorStop(.18,hexAlpha(color,1));
+  glow.addColorStop(1,hexAlpha(color,.05));
+
+  ctx.shadowColor=color;
+  ctx.shadowBlur=18;
+
+  ctx.fillStyle=glow;
+
+  ctx.beginPath();
+  ctx.arc(0,0,b.radius,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.shadowBlur=0;
+
+  ctx.strokeStyle="#fff";
+  ctx.globalAlpha=.75;
+  ctx.lineWidth=1.5;
+
+  ctx.beginPath();
+  ctx.arc(0,0,b.radius,0,Math.PI*2);
+  ctx.stroke();
+
+  ctx.globalAlpha=1;
+
+  ctx.rotate(b.rot);
+
+  ctx.fillStyle="#fff";
+  ctx.font="900 "+Math.max(10,b.radius*.55)+"px Consolas";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+
+  ctx.fillText(
+    "$"+b.value,
+    0,0
+  );
+
+  // Nombre grande y muy legible.
+  const label = b.label.toUpperCase();
+  const maxWidth = 150;
+  let labelFont = 17;
+
+  ctx.font = "900 " + labelFont + "px Consolas";
+
+  // Reduce un poco el tamaño solo si el nombre es muy largo.
+  while(
+    ctx.measureText(label).width > maxWidth &&
+    labelFont > 12
+  ){
+    labelFont--;
+    ctx.font = "900 " + labelFont + "px Consolas";
+  }
+
+  // Caja de lectura debajo de la bolita.
+  const textWidth = Math.min(maxWidth, ctx.measureText(label).width + 18);
+  const boxHeight = labelFont + 14;
+
+  ctx.fillStyle = "rgba(2,8,5,.92)";
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+
+  ctx.beginPath();
+  ctx.roundRect(
+    -textWidth/2,
+    b.radius + 7,
+    textWidth,
+    boxHeight,
+    7
+  );
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle="#ffffff";
+  ctx.font="900 " + labelFont + "px Consolas";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+
+  ctx.fillText(
+    label,
+    0,
+    b.radius + 7 + boxHeight/2
+  );
+
+  ctx.restore();
+}
+
+/* =========================================================
+   PARTÍCULAS
+========================================================= */
+
+function addParticles(x,y,color,count){
+
+  for(let i=0;i<count;i++){
+
+    const a=Math.random()*Math.PI*2;
+    const s=1+Math.random()*4;
+
+    state.particles.push({
+      x,y,
+      vx:Math.cos(a)*s,
+      vy:Math.sin(a)*s-1,
+      r:2+Math.random()*3,
+      life:350+Math.random()*450,
+      color
+    });
+  }
+
+  state.screenShake=150;
+}
+
+function drawParticles(){
+
+  state.particles =
+    state.particles.filter(
+      p=>p.life>0
+    );
+
+  state.particles.forEach(p=>{
+
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += .04;
+    p.life -= 16;
+
+    ctx.globalAlpha=Math.max(0,p.life/500);
+    ctx.fillStyle=p.color;
+
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fill();
+  });
+
+  ctx.globalAlpha=1;
+}
+
+/* =========================================================
+   TEXTOS FLOTANTES
+========================================================= */
+
+function addFloat(x,y,text,type){
+  state.floats.push({
+    x,y,text,type,life:900
+  });
+}
+
+function drawFloats(){
+
+  state.floats =
+    state.floats.filter(
+      f=>f.life>0
+    );
+
+  state.floats.forEach(f=>{
+
+    const a=Math.max(0,f.life/900);
+
+    ctx.globalAlpha=a;
+
+    ctx.fillStyle=
+      f.type==="good"
+        ? COLORS.green
+        : f.type==="bad"
+          ? COLORS.red
+          : COLORS.cyan;
+
+    ctx.font="900 16px Consolas";
+    ctx.textAlign="center";
+
+    ctx.fillText(
+      f.text,
+      f.x,
+      f.y-(900-f.life)*.045
+    );
+
+    f.life-=16;
+  });
+
+  ctx.globalAlpha=1;
+}
+
+/* =========================================================
+   UPDATE
+========================================================= */
+
+function update(dt){
+
+  if(
+    !state.running ||
+    state.paused ||
+    state.gameOver ||
+    state.victory
+  ){
+    return;
+  }
+
+  if(!state.current){
+    return;
+  }
+
+  const b=state.current;
+
+  /*
+    DOS TIPOS DE VELOCIDAD:
+    - CAÍDA: qué tan rápido baja la bolita.
+    - APARICIÓN: qué tan seguido llega una nueva bolita/ritmo del juego.
+  */
+  const fallSpeed = currentFallSpeed();
+  const spawnInterval = currentSpawnInterval();
+
+  b.y += fallSpeed * (dt / 1000);
+
+  if(b.vy > 0){
+    b.y += Math.min(b.vy, 300) * (dt / 1000);
+    b.vy *= 0.90;
+
+    if(b.vy < 2){
+      b.vy = 0;
+    }
+  }
+
+  state.spawnTimer += dt;
+
+  if(state.spawnTimer >= spawnInterval){
+    state.spawnTimer = 0;
+    state.stress = Math.min(
+      100,
+      state.stress + 0.35
+    );
+  }
+
+  clampBall();
+
+  if(b.y+b.radius >= H-180){
+
+    b.y=H-180-b.radius;
+    landBall();
+  }
+
+  if(state.event){
+
+    state.eventTimer -= dt;
+
+    if(state.eventTimer <= 0){
+      state.event=null;
+    }
+  }
+
+  state.stress =
+    Math.min(
+      100,
+      state.stress +
+      (
+        state.event==="blackfriday"
+          ? dt*.0017
+          : dt*.00025
+      )
+    );
+
+  if(state.combo>0){
+
+    state.combo=
+      Math.max(
+        0,
+        state.combo-(dt/4200)
+      );
+  }
+
+  state.flash=Math.max(0,state.flash-dt);
+  state.screenShake=Math.max(0,state.screenShake-dt);
+}
+
+/* =========================================================
+   LOOP
+========================================================= */
+
+function loop(t){
+
+  const dt=Math.min(
+    35,
+    (t-lastTime)||16
+  );
+
+  lastTime=t;
+
+  update(dt);
+  draw();
+  updateUI();
+
+  raf=requestAnimationFrame(loop);
+}
+
+/* =========================================================
+   CONTROLES
+========================================================= */
+
+document.addEventListener("keydown",e=>{
+
+  if([
+    "ArrowLeft",
+    "ArrowRight",
+    "ArrowDown",
+    " ",
+    "Enter",
+    "p","P",
+    "r","R",
+    "x","X"
+  ].includes(e.key)){
+    e.preventDefault();
+  }
+
+  if(e.key==="ArrowLeft") moveBall(-28);
+  else if(e.key==="ArrowRight") moveBall(28);
+  else if(e.key==="ArrowDown") dropToBottom();
+  else if(e.key===" ") dropToBottom();
+  else if(e.key==="x"||e.key==="X") rotateBall();
+  else if(e.key==="p"||e.key==="P") togglePause();
+  else if((e.key==="r"||e.key==="R")) startGame();
+  else if(e.key==="Enter"&&!state.running) startGame();
+});
+
+/* =========================================================
+   MOUSE / TOUCH
+========================================================= */
+
+let dragging=false;
+
+canvas.addEventListener("pointerdown",e=>{
+
+  if(!state.current||!state.running||state.paused) return;
+
+  dragging=true;
+
+  canvas.setPointerCapture(e.pointerId);
+
+  movePointer(e);
+});
+
+canvas.addEventListener("pointermove",e=>{
+  if(dragging) movePointer(e);
+});
+
+canvas.addEventListener("pointerup",()=>{
+  dragging=false;
+});
+
+function movePointer(e){
+
+  const rect=canvas.getBoundingClientRect();
+
+  const x=
+    (e.clientX-rect.left)*
+    (W/rect.width);
+
+  state.current.x=x;
+
+  clampBall();
+}
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+document.getElementById("autoBtn")
+  .addEventListener("click",autoControl);
+
+document.getElementById("pauseBtn")
+  .addEventListener("click",togglePause);
+
+document.getElementById("restartBtn")
+  .addEventListener("click",showStartModal);
+
+document.getElementById("startBtn")
+  .addEventListener("click",startGame);
+
+document.getElementById("howBtn")
+  .addEventListener("click",()=>{
+    toast(
+      "🎮 Elige dificultad. Luego mueve cada bolita al contenedor de su mismo color. La velocidad aumenta poco a poco con cada nivel."
+    );
+  });
+
+document.querySelectorAll(".diff-btn")
+  .forEach(btn=>{
+
+    btn.addEventListener("click",()=>{
+
+      selectedDifficulty=
+        btn.dataset.diff;
+
+      document.querySelectorAll(".diff-btn")
+        .forEach(b=>b.classList.remove("selected"));
+
+      btn.classList.add("selected");
+
+      if(state) state.difficulty=selectedDifficulty;
+
+      updateUI();
+
+      toast(
+        "🎚️ Dificultad seleccionada: " +
+        DIFFICULTIES[selectedDifficulty].label
+      );
+    });
+  });
+
+/* =========================================================
+   PAUSA
+========================================================= */
+
+function togglePause(){
+
+  if(!state.running){
+    return;
+  }
+
+  state.paused=!state.paused;
+
+  document.getElementById("pauseBtn").textContent =
+    state.paused
+      ? "▶️ CONTINUAR"
+      : "⏸️ PAUSAR";
+
+  toast(
+    state.paused
+      ? "⏸️ Juego pausado"
+      : "▶️ Juego reanudado"
+  );
+}
+
+/* =========================================================
+   COLOR
+========================================================= */
+
+function hexAlpha(hex,alpha){
+
+  const h=hex.replace("#","");
+  const n=parseInt(h,16);
+
+  const r=(n>>16)&255;
+  const g=(n>>8)&255;
+  const b=n&255;
+
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+/* =========================================================
+   INICIO
+========================================================= */
+
+resetState();
+showStartModal();
+
+raf=requestAnimationFrame(function inicial(t){
+  lastTime=t;
+  raf=requestAnimationFrame(loop);
+});
+
+})();
+</script>
+
+</body>
+</html>

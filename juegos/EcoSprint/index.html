@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoSprint: Clasificación al Límite</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(135deg, #0b3d2e, #126e51, #08261d);
+    color: white;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+button {
+    font-family: inherit;
+}
+
+.screen {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* =========================
+   MENÚ
+========================= */
+
+.menu {
+    text-align: center;
+    width: min(900px, 94vw);
+    padding: 40px;
+    background: rgba(0,0,0,.35);
+    border-radius: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+
+.logo {
+    font-size: clamp(40px, 7vw, 78px);
+    margin: 0;
+    color: #8cffb5;
+    text-shadow: 0 5px 0 #075536;
+}
+
+.subtitle {
+    font-size: 20px;
+    opacity: .9;
+    margin-bottom: 35px;
+}
+
+.difficulties {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.difficulty {
+    border: 3px solid transparent;
+    border-radius: 20px;
+    padding: 25px 35px;
+    min-width: 190px;
+    cursor: pointer;
+    color: white;
+    font-size: 21px;
+    font-weight: bold;
+    transition: .2s;
+}
+
+.difficulty:hover {
+    transform: translateY(-7px) scale(1.03);
+}
+
+.easy {
+    background: #299b55;
+}
+
+.medium {
+    background: #d69219;
+}
+
+.hard {
+    background: #c53b3b;
+}
+
+.rules {
+    margin: 30px auto 0;
+    max-width: 650px;
+    padding: 20px;
+    background: rgba(255,255,255,.08);
+    border-radius: 15px;
+    line-height: 1.6;
+}
+
+/* =========================
+   JUEGO
+========================= */
+
+#gameScreen {
+    position: relative;
+    display: block;
+    overflow: hidden;
+}
+
+.hud {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    right: 20px;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.hud-box {
+    background: rgba(0,0,0,.55);
+    border: 2px solid rgba(255,255,255,.15);
+    padding: 10px 16px;
+    border-radius: 14px;
+    font-weight: bold;
+}
+
+.hearts {
+    color: #ff4b5c;
+    letter-spacing: 4px;
+}
+
+#gameArea {
+    position: absolute;
+    inset: 0;
+}
+
+/* =========================
+   CONTENEDORES
+========================= */
+
+.bin {
+    position: absolute;
+    width: 150px;
+    height: 125px;
+    border-radius: 15px 15px 25px 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border: 5px solid rgba(255,255,255,.85);
+    box-shadow: 0 10px 20px rgba(0,0,0,.3);
+    transition: .15s;
+    z-index: 20;
+}
+
+.bin::before {
+    content: "";
+    position: absolute;
+    width: 160px;
+    height: 15px;
+    top: -17px;
+    border-radius: 10px;
+    background: #333;
+}
+
+.bin-icon {
+    font-size: 42px;
+}
+
+.bin-label {
+    font-size: 17px;
+    text-shadow: 1px 2px 2px rgba(0,0,0,.4);
+}
+
+.bin.correct {
+    transform: scale(1.15);
+    box-shadow: 0 0 30px white;
+}
+
+.plastic {
+    top: 105px;
+    left: 8%;
+    background: #188cff;
+}
+
+.paper {
+    top: 105px;
+    right: 8%;
+    background: #ead36b;
+    color: #3b3100;
+}
+
+.organic {
+    bottom: 175px;
+    left: 8%;
+    background: #5aa832;
+}
+
+.glass {
+    bottom: 175px;
+    right: 8%;
+    background: #22a89a;
+}
+
+/* =========================
+   CINTA
+========================= */
+
+.conveyor-wrapper {
+    position: absolute;
+    left: 4%;
+    right: 4%;
+    bottom: 65px;
+    height: 190px;
+}
+
+.conveyor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 30px;
+    height: 105px;
+    border-radius: 60px;
+    border: 8px solid #20252a;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            #50585e 0px,
+            #50585e 45px,
+            #353b40 45px,
+            #353b40 65px
+        );
+    box-shadow:
+        inset 0 10px 20px rgba(255,255,255,.1),
+        0 15px 30px rgba(0,0,0,.4);
+    animation: conveyorMove .45s linear infinite;
+}
+
+@keyframes conveyorMove {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: -65px 0;
+    }
+}
+
+.end-bin {
+    position: absolute;
+    right: -8px;
+    bottom: 0;
+    width: 125px;
+    height: 150px;
+    background: #151515;
+    border: 6px solid #777;
+    border-radius: 12px 12px 25px 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 15;
+    box-shadow: 0 10px 25px rgba(0,0,0,.5);
+}
+
+.end-bin span {
+    font-size: 45px;
+}
+
+/* =========================
+   BASURA
+========================= */
+
+.waste {
+    position: absolute;
+    width: 75px;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 43px;
+    cursor: grab;
+    z-index: 30;
+    filter: drop-shadow(0 6px 5px rgba(0,0,0,.35));
+    transition: transform .12s;
+    touch-action: none;
+}
+
+.waste:hover {
+    transform: scale(1.12);
+}
+
+.waste.dragging {
+    cursor: grabbing;
+    transform: scale(1.2);
+    z-index: 100;
+}
+
+/* =========================
+   POTENCIADORES
+========================= */
+
+.powerups {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 60;
+    display: flex;
+    gap: 10px;
+}
+
+.powerup {
+    background: #7d4cff;
+    border: 2px solid #c7b7ff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.powerup:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
+/* =========================
+   MENSAJES
+========================= */
+
+#feedback {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 34px;
+    font-weight: bold;
+    text-shadow: 0 3px 5px black;
+    z-index: 200;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.feedback-show {
+    animation: feedbackAnim .9s ease forwards;
+}
+
+@keyframes feedbackAnim {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -40%) scale(.7);
+    }
+    25% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -70%) scale(1);
+    }
+}
+
+/* =========================
+   FINAL
+========================= */
+
+.final-card {
+    width: min(650px, 90vw);
+    background: rgba(0,0,0,.5);
+    border-radius: 30px;
+    padding: 45px;
+    text-align: center;
+}
+
+.final-card h1 {
+    font-size: 45px;
+    color: #8cffb5;
+}
+
+.final-score {
+    font-size: 55px;
+    font-weight: bold;
+    color: #ffe36e;
+}
+
+.restart {
+    background: #26a65b;
+    border: none;
+    color: white;
+    font-size: 20px;
+    padding: 16px 35px;
+    border-radius: 15px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.restart:hover {
+    background: #35c76e;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 700px) {
+    .bin {
+        width: 105px;
+        height: 90px;
+    }
+
+    .bin::before {
+        width: 110px;
+    }
+
+    .bin-icon {
+        font-size: 30px;
+    }
+
+    .bin-label {
+        font-size: 13px;
+    }
+
+    .plastic,
+    .paper {
+        top: 90px;
+    }
+
+    .organic,
+    .glass {
+        bottom: 230px;
+    }
+
+    .conveyor-wrapper {
+        bottom: 100px;
+    }
+
+    .waste {
+        width: 60px;
+        height: 60px;
+        font-size: 35px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     MENÚ PRINCIPAL
+========================= -->
+
+<section id="menuScreen" class="screen">
+    <div class="menu">
+
+        <h1 class="logo">🌱 EcoSprint</h1>
+
+        <div class="subtitle">
+            Clasificación al Límite
+        </div>
+
+        <h2>Elige la dificultad</h2>
+
+        <div class="difficulties">
+
+            <button class="difficulty easy"
+                    onclick="startGame('easy')">
+                🟢 FÁCIL
+                <br>
+                <small>Cinta lenta</small>
+            </button>
+
+            <button class="difficulty medium"
+                    onclick="startGame('medium')">
+                🟡 MEDIO
+                <br>
+                <small>Velocidad normal</small>
+            </button>
+
+            <button class="difficulty hard"
+                    onclick="startGame('hard')">
+                🔴 DIFÍCIL
+                <br>
+                <small>Cinta rápida</small>
+            </button>
+
+        </div>
+
+        <div class="rules">
+            <strong>🎯 ¿Cómo jugar?</strong><br>
+            Arrastra cada residuo hasta su contenedor correcto.
+            <br>
+            ❌ Si lo colocas mal: pierdes 1 vida.
+            <br>
+            🗑️ Si llega al contenedor negro: pierdes 1 vida.
+            <br>
+            ❤️ Tienes 3 vidas.
+            <br>
+            ⏱️ Cada ronda dura 40 segundos.
+            <br>
+            ⚡ Desde la ronda 4 aparecen potenciadores.
+        </div>
+
+    </div>
+</section>
+
+
+<!-- =========================
+     JUEGO
+========================= -->
+
+<section id="gameScreen" class="screen hidden">
+
+    <div class="hud">
+
+        <div class="hud-box">
+            Ronda:
+            <span id="round">1</span>
+        </div>
+
+        <div class="hud-box">
+            ⏱️
+            <span id="timer">40</span>s
+        </div>
+
+        <div class="hud-box">
+            ⭐
+            <span id="score">0</span>
+        </div>
+
+        <div class="hud-box">
+            ❤️
+            <span id="lives">❤️❤️❤️</span>
+        </div>
+
+        <div class="hud-box">
+            Dificultad:
+            <span id="difficultyText">Fácil</span>
+        </div>
+
+    </div>
+
+
+    <div id="gameArea">
+
+        <!-- CONTENEDORES -->
+
+        <div class="bin plastic"
+             data-type="plastic">
+            <div class="bin-icon">🥤</div>
+            <div class="bin-label">PLÁSTICO</div>
+        </div>
+
+        <div class="bin paper"
+             data-type="paper">
+            <div class="bin-icon">📄</div>
+            <div class="bin-label">PAPEL</div>
+        </div>
+
+        <div class="bin organic"
+             data-type="organic">
+            <div class="bin-icon">🍎</div>
+            <div class="bin-label">ORGÁNICO</div>
+        </div>
+
+        <div class="bin glass"
+             data-type="glass">
+            <div class="bin-icon">🍾</div>
+            <div class="bin-label">VIDRIO</div>
+        </div>
+
+
+        <!-- CINTA -->
+
+        <div class="conveyor-wrapper">
+
+            <div class="conveyor" id="conveyor"></div>
+
+            <div class="end-bin" id="endBin">
+                <span>🗑️</span>
+                <strong>FINAL</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- POTENCIADORES -->
+
+    <div class="powerups">
+
+        <button
+            id="slowPowerup"
+            class="powerup"
+            onclick="activateSlowMotion()"
+            disabled>
+            ❄️ Ralentizar cinta
+        </button>
+
+    </div>
+
+    <div id="feedback"></div>
+
+</section>
+
+
+<!-- =========================
+     PANTALLA FINAL
+========================= -->
+
+<section id="finalScreen" class="screen hidden">
+
+    <div class="final-card">
+
+        <h1 id="finalTitle">🌱 ¡Partida terminada!</h1>
+
+        <p id="finalMessage">
+            Buen trabajo clasificando residuos.
+        </p>
+
+        <div class="final-score">
+            <span id="finalScore">0</span>
+            ⭐
+        </div>
+
+        <p>
+            Rondas superadas:
+            <strong id="finalRound">0</strong>
+        </p>
+
+        <p>
+            Residuos correctamente clasificados:
+            <strong id="correctWaste">0</strong>
+        </p>
+
+        <button class="restart" onclick="goToMenu()">
+            🔄 Jugar nuevamente
+        </button>
+
+    </div>
+
+</section>
+
+
+<script>
+
+/* =====================================================
+   CONFIGURACIÓN DEL JUEGO
+===================================================== */
+
+const difficultySettings = {
+
+    easy: {
+        name: "Fácil",
+        speed: 0.85,
+        spawnTime: 1800
+    },
+
+    medium: {
+        name: "Medio",
+        speed: 1.45,
+        spawnTime: 1450
+    },
+
+    hard: {
+        name: "Difícil",
+        speed: 2.15,
+        spawnTime: 1100
+    }
+
+};
+
+
+/* =====================================================
+   TIPOS DE RESIDUOS
+===================================================== */
+
+const wasteTypes = {
+
+    plastic: {
+        name: "Plástico",
+        emojis: ["🥤", "🧴", "🛍️", "🥡"]
+    },
+
+    paper: {
+        name: "Papel",
+        emojis: ["📄", "📰", "📦", "📚"]
+    },
+
+    organic: {
+        name: "Orgánico",
+        emojis: ["🍎", "🍌", "🥕", "🍂"]
+    },
+
+    glass: {
+        name: "Vidrio",
+        emojis: ["🍾", "🫙", "🥛", "🍷"]
+    }
+
+};
+
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+let difficulty = "easy";
+
+let currentRound = 1;
+let lives = 3;
+let score = 0;
+let correctCount = 0;
+
+let timeLeft = 40;
+
+let gameRunning = false;
+
+let timerInterval = null;
+let spawnInterval = null;
+
+let wasteObjects = [];
+
+let slowActive = false;
+let slowAvailable = false;
+
+let roundDuration = 40000;
+
+
+/* =====================================================
+   ELEMENTOS
+===================================================== */
+
+const menuScreen = document.getElementById("menuScreen");
+const gameScreen = document.getElementById("gameScreen");
+const finalScreen = document.getElementById("finalScreen");
+
+const gameArea = document.getElementById("gameArea");
+
+const timerElement = document.getElementById("timer");
+const scoreElement = document.getElementById("score");
+const livesElement = document.getElementById("lives");
+const roundElement = document.getElementById("round");
+
+const difficultyText =
+    document.getElementById("difficultyText");
+
+const feedback =
+    document.getElementById("feedback");
+
+const slowButton =
+    document.getElementById("slowPowerup");
+
+
+/* =====================================================
+   INICIAR PARTIDA
+===================================================== */
+
+function startGame(selectedDifficulty) {
+
+    difficulty = selectedDifficulty;
+
+    currentRound = 1;
+    lives = 3;
+    score = 0;
+    correctCount = 0;
+
+    menuScreen.classList.add("hidden");
+    finalScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+
+    difficultyText.textContent =
+        difficultySettings[difficulty].name;
+
+    updateHUD();
+
+    startRound();
+}
+
+
+/* =====================================================
+   INICIAR RONDA
+===================================================== */
+
+function startRound() {
+
+    gameRunning = true;
+
+    timeLeft = 40;
+
+    clearIntervals();
+
+    removeAllWaste();
+
+    updateHUD();
+
+    timerInterval = setInterval(() => {
+
+        timeLeft--;
+
+        timerElement.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+
+            finishRound();
+
+        }
+
+    }, 1000);
+
+
+    spawnInterval = setInterval(
+        spawnWaste,
+        getSpawnTime()
+    );
+
+
+    // Aparece inmediatamente el primer residuo
+    setTimeout(spawnWaste, 500);
+}
+
+
+/* =====================================================
+   VELOCIDAD / DIFICULTAD PROGRESIVA
+===================================================== */
+
+function getSpeed() {
+
+    let base =
+        difficultySettings[difficulty].speed;
+
+    /*
+       Cada ronda aumenta ligeramente la velocidad,
+       pero ponemos un límite para mantener el juego jugable.
+    */
+
+    let progressiveBonus =
+        Math.min((currentRound - 1) * 0.12, 1.2);
+
+    return Math.min(
+        base + progressiveBonus,
+        difficulty === "easy" ? 2.0 :
+        difficulty === "medium" ? 2.7 :
+        3.5
+    );
+}
+
+
+function getSpawnTime() {
+
+    let base =
+        difficultySettings[difficulty].spawnTime;
+
+    /*
+       Con cada ronda aparecen residuos un poco más rápido.
+       Nunca bajamos de 650 ms para evitar una saturación
+       injusta.
+    */
+
+    return Math.max(
+        650,
+        base - ((currentRound - 1) * 70)
+    );
+}
+
+
+/* =====================================================
+   CREAR BASURA
+===================================================== */
+
+function spawnWaste() {
+
+    if (!gameRunning) return;
+
+    const types =
+        Object.keys(wasteTypes);
+
+    const type =
+        types[Math.floor(Math.random() * types.length)];
+
+    const data =
+        wasteTypes[type];
+
+    const emoji =
+        data.emojis[
+            Math.floor(
+                Math.random() * data.emojis.length
+            )
+        ];
+
+    const waste =
+        document.createElement("div");
+
+    waste.className = "waste";
+
+    waste.textContent = emoji;
+
+    waste.dataset.type = type;
+
+    /*
+       Se crea dentro del área de juego.
+       Aparece a la izquierda de la cinta.
+    */
+
+    const areaHeight =
+        gameArea.clientHeight;
+
+    const conveyorY =
+        areaHeight - 190;
+
+    waste.style.left = "-80px";
+
+    waste.style.top =
+        (conveyorY + 40) + "px";
+
+    gameArea.appendChild(waste);
+
+
+    const object = {
+
+        element: waste,
+
+        type: type,
+
+        x: -80,
+
+        y: conveyorY + 40,
+
+        width: 75,
+
+        dragging: false,
+
+        velocity: getSpeed(),
+
+        removed: false
+
+    };
+
+
+    wasteObjects.push(object);
+
+    enableDrag(object);
+
+    moveWaste(object);
+}
+
+
+/* =====================================================
+   MOVIMIENTO DE LA BASURA
+===================================================== */
+
+function moveWaste(object) {
+
+    if (object.removed) return;
+
+    if (!object.dragging) {
+
+        let speed =
+            object.velocity;
+
+        if (slowActive) {
+            speed *= 0.35;
+        }
+
+        object.x += speed;
+
+        object.element.style.left =
+            object.x + "px";
+
+    }
+
+    /*
+       Cuando alcanza el extremo derecho,
+       entra al contenedor negro.
+    */
+
+    if (object.x >
+        gameArea.clientWidth - 125) {
+
+        loseLife(
+            "🗑️ ¡La basura llegó al contenedor negro!"
+        );
+
+        removeWaste(object);
+
+        return;
+    }
+
+    requestAnimationFrame(
+        () => moveWaste(object)
+    );
+}
+
+
+/* =====================================================
+   DRAG & DROP
+===================================================== */
+
+function enableDrag(object) {
+
+    const el = object.element;
+
+    let offsetX = 0;
+    let offsetY = 0;
+
+    el.addEventListener(
+        "pointerdown",
+        event => {
+
+            if (!gameRunning) return;
+
+            object.dragging = true;
+
+            el.setPointerCapture(
+                event.pointerId
+            );
+
+            const rect =
+                el.getBoundingClientRect();
+
+            offsetX =
+                event.clientX - rect.left;
+
+            offsetY =
+                event.clientY - rect.top;
+
+            el.classList.add("dragging");
+        }
+    );
+
+
+    el.addEventListener(
+        "pointermove",
+        event => {
+
+            if (!object.dragging) return;
+
+            const areaRect =
+                gameArea.getBoundingClientRect();
+
+            object.x =
+                event.clientX -
+                areaRect.left -
+                offsetX;
+
+            object.y =
+                event.clientY -
+                areaRect.top -
+                offsetY;
+
+            el.style.left =
+                object.x + "px";
+
+            el.style.top =
+                object.y + "px";
+        }
+    );
+
+
+    el.addEventListener(
+        "pointerup",
+        event => {
+
+            if (!object.dragging) return;
+
+            object.dragging = false;
+
+            el.classList.remove("dragging");
+
+            checkDrop(object);
+        }
+    );
+
+
+    el.addEventListener(
+        "pointercancel",
+        () => {
+
+            object.dragging = false;
+
+            el.classList.remove("dragging");
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   COMPROBAR CONTENEDOR
+===================================================== */
+
+function checkDrop(object) {
+
+    const wasteRect =
+        object.element.getBoundingClientRect();
+
+    const bins =
+        document.querySelectorAll(".bin");
+
+    let droppedBin = null;
+
+    bins.forEach(bin => {
+
+        const binRect =
+            bin.getBoundingClientRect();
+
+        if (isOverlapping(
+            wasteRect,
+            binRect
+        )) {
+
+            droppedBin = bin;
+
+        }
+
+    });
+
+
+    if (!droppedBin) {
+
+        /*
+           Si no lo soltó sobre ningún contenedor,
+           vuelve a la cinta.
+        */
+
+        object.y =
+            gameArea.clientHeight - 150;
+
+        object.element.style.top =
+            object.y + "px";
+
+        return;
+    }
+
+
+    const selectedType =
+        droppedBin.dataset.type;
+
+
+    if (selectedType === object.type) {
+
+        /*
+           CORRECTO
+        */
+
+        droppedBin.classList.add("correct");
+
+        setTimeout(() => {
+            droppedBin.classList.remove("correct");
+        }, 250);
+
+        score +=
+            100 + (currentRound * 20);
+
+        correctCount++;
+
+        showFeedback(
+            "✅ ¡Correcto! + puntos",
+            "#65ff91"
+        );
+
+        removeWaste(object);
+
+    } else {
+
+        /*
+           INCORRECTO:
+           PIERDE UNA VIDA.
+        */
+
+        loseLife(
+            "❌ ¡Contenedor incorrecto! -1 vida"
+        );
+
+        removeWaste(object);
+
+    }
+
+    updateHUD();
+}
+
+
+/* =====================================================
+   COLISIÓN
+===================================================== */
+
+function isOverlapping(a, b) {
+
+    return !(
+        a.right < b.left ||
+        a.left > b.right ||
+        a.bottom < b.top ||
+        a.top > b.bottom
+    );
+
+}
+
+
+/* =====================================================
+   PERDER VIDA
+===================================================== */
+
+function loseLife(message) {
+
+    lives--;
+
+    updateHUD();
+
+    showFeedback(
+        message,
+        "#ff5252"
+    );
+
+    /*
+       Vibración si el dispositivo lo permite.
+    */
+
+    if (navigator.vibrate) {
+        navigator.vibrate(180);
+    }
+
+
+    if (lives <= 0) {
+
+        gameOver();
+
+    }
+
+}
+
+
+/* =====================================================
+   FEEDBACK
+===================================================== */
+
+function showFeedback(
+    message,
+    color
+) {
+
+    feedback.textContent = message;
+
+    feedback.style.color = color;
+
+    feedback.classList.remove(
+        "feedback-show"
+    );
+
+    void feedback.offsetWidth;
+
+    feedback.classList.add(
+        "feedback-show"
+    );
+
+}
+
+
+/* =====================================================
+   ELIMINAR BASURA
+===================================================== */
+
+function removeWaste(object) {
+
+    if (object.removed) return;
+
+    object.removed = true;
+
+    if (object.element.parentNode) {
+
+        object.element.parentNode
+            .removeChild(object.element);
+
+    }
+
+    const index =
+        wasteObjects.indexOf(object);
+
+    if (index !== -1) {
+
+        wasteObjects.splice(
+            index,
+            1
+        );
+
+    }
+
+}
+
+
+function removeAllWaste() {
+
+    wasteObjects.forEach(
+        object => {
+
+            if (object.element.parentNode) {
+
+                object.element.parentNode
+                    .removeChild(object.element);
+
+            }
+
+        }
+    );
+
+    wasteObjects = [];
+
+}
+
+
+/* =====================================================
+   FINALIZAR RONDA
+===================================================== */
+
+function finishRound() {
+
+    if (!gameRunning) return;
+
+    clearIntervals();
+
+    /*
+       Si todavía tiene vidas,
+       pasa a la siguiente ronda.
+    */
+
+    currentRound++;
+
+    if (currentRound >= 4) {
+
+        slowAvailable = true;
+
+        slowButton.disabled = false;
+
+    }
+
+    showFeedback(
+        "🎉 ¡Ronda superada!",
+        "#ffe66d"
+    );
+
+    setTimeout(() => {
+
+        if (lives > 0) {
+
+            startRound();
+
+        }
+
+    }, 1200);
+
+}
+
+
+/* =====================================================
+   GAME OVER
+===================================================== */
+
+function gameOver() {
+
+    gameRunning = false;
+
+    clearIntervals();
+
+    removeAllWaste();
+
+    gameScreen.classList.add("hidden");
+
+    finalScreen.classList.remove("hidden");
+
+    document.getElementById(
+        "finalScore"
+    ).textContent = score;
+
+    document.getElementById(
+        "finalRound"
+    ).textContent =
+        Math.max(0, currentRound - 1);
+
+    document.getElementById(
+        "correctWaste"
+    ).textContent = correctCount;
+
+    document.getElementById(
+        "finalTitle"
+    ).textContent =
+        "💥 ¡Se acabaron las vidas!";
+
+    document.getElementById(
+        "finalMessage"
+    ).textContent =
+        "La cinta fue demasiado para ti esta vez. ¡Inténtalo de nuevo y mejora tu clasificación!";
+
+}
+
+
+/* =====================================================
+   POTENCIADOR: RALENTIZAR
+===================================================== */
+
+function activateSlowMotion() {
+
+    if (
+        !slowAvailable ||
+        slowActive ||
+        !gameRunning
+    ) return;
+
+
+    slowActive = true;
+
+    slowAvailable = false;
+
+    slowButton.disabled = true;
+
+    slowButton.textContent =
+        "❄️ Cinta ralentizada";
+
+
+    showFeedback(
+        "❄️ ¡CINTA RALENTIZADA!",
+        "#aee8ff"
+    );
+
+
+    setTimeout(() => {
+
+        slowActive = false;
+
+        slowButton.textContent =
+            "❄️ Ralentizar cinta";
+
+    }, 10000);
+
+}
+
+
+/* =====================================================
+   HUD
+===================================================== */
+
+function updateHUD() {
+
+    roundElement.textContent =
+        currentRound;
+
+    scoreElement.textContent =
+        score;
+
+    timerElement.textContent =
+        timeLeft;
+
+    livesElement.textContent =
+        "❤️".repeat(lives) +
+        "🖤".repeat(
+            Math.max(0, 3 - lives)
+        );
+
+}
+
+
+/* =====================================================
+   INTERVALOS
+===================================================== */
+
+function clearIntervals() {
+
+    if (timerInterval) {
+
+        clearInterval(
+            timerInterval
+        );
+
+        timerInterval = null;
+
+    }
+
+    if (spawnInterval) {
+
+        clearInterval(
+            spawnInterval
+        );
+
+        spawnInterval = null;
+
+    }
+
+}
+
+
+/* =====================================================
+   VOLVER AL MENÚ
+===================================================== */
+
+function goToMenu() {
+
+    clearIntervals();
+
+    gameRunning = false;
+
+    removeAllWaste();
+
+    slowActive = false;
+
+    slowAvailable = false;
+
+    slowButton.disabled = true;
+
+    slowButton.textContent =
+        "❄️ Ralentizar cinta";
+
+    finalScreen.classList.add("hidden");
+
+    gameScreen.classList.add("hidden");
+
+    menuScreen.classList.remove("hidden");
+
+}
+
+
+/* =====================================================
+   EVITAR ARRASTRE DE IMÁGENES/TEXTO
+===================================================== */
+
+document.addEventListener(
+    "dragstart",
+    event => event.preventDefault()
+);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CYBER SHIFT - El poder de tus palabras</title>
+
+<style>
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+:root {
+    --bg: #070b14;
+    --panel: #101827;
+    --panel2: #172033;
+    --primary: #00e5ff;
+    --secondary: #8b5cf6;
+    --danger: #ff3d71;
+    --success: #00e676;
+    --warning: #ffc400;
+    --text: #eaf6ff;
+    --muted: #8190a5;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background:
+        radial-gradient(circle at top, #14213d 0%, #070b14 45%);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* =========================================================
+   FONDO ANIMADO
+========================================================= */
+
+#particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--primary);
+    animation: float linear infinite;
+    opacity: .5;
+}
+
+@keyframes float {
+    from {
+        transform: translateY(110vh);
+    }
+    to {
+        transform: translateY(-10vh);
+    }
+}
+
+/* =========================================================
+   PANTALLAS
+========================================================= */
+
+.screen {
+    display: none;
+    min-height: 100vh;
+    padding: 30px;
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* =========================================================
+   INICIO
+========================================================= */
+
+#startScreen {
+    justify-content: center;
+    align-items: center;
+}
+
+.start-box {
+    max-width: 850px;
+    width: 100%;
+    text-align: center;
+    padding: 50px 30px;
+    border: 1px solid rgba(0,229,255,.3);
+    background: rgba(16,24,39,.82);
+    backdrop-filter: blur(12px);
+    border-radius: 25px;
+    box-shadow:
+        0 0 30px rgba(0,229,255,.12),
+        0 0 80px rgba(139,92,246,.08);
+}
+
+.logo {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    letter-spacing: 8px;
+    background: linear-gradient(
+        90deg,
+        var(--primary),
+        #ffffff,
+        var(--secondary)
+    );
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        filter: drop-shadow(0 0 5px var(--primary));
+    }
+    to {
+        filter: drop-shadow(0 0 20px var(--secondary));
+    }
+}
+
+.subtitle {
+    margin: 20px auto;
+    max-width: 650px;
+    color: var(--muted);
+    line-height: 1.7;
+    font-size: 1.1rem;
+}
+
+.player-input {
+    width: min(400px, 100%);
+    padding: 15px 20px;
+    border-radius: 12px;
+    border: 1px solid #314158;
+    background: #09111d;
+    color: white;
+    outline: none;
+    font-size: 1rem;
+    margin: 20px 0;
+}
+
+.player-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(0,229,255,.2);
+}
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+button {
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: .25s;
+}
+
+.main-btn {
+    display: block;
+    margin: 10px auto;
+    width: min(380px, 100%);
+    padding: 16px 20px;
+    border-radius: 12px;
+    color: #021018;
+    background: linear-gradient(90deg, var(--primary), #72f4ff);
+    font-size: 1rem;
+    box-shadow: 0 0 20px rgba(0,229,255,.25);
+}
+
+.main-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 0 30px rgba(0,229,255,.5);
+}
+
+.secondary-btn {
+    display: block;
+    margin: 10px auto;
+    width: min(380px, 100%);
+    padding: 15px;
+    border-radius: 12px;
+    background: #202c3d;
+    color: white;
+}
+
+.secondary-btn:hover {
+    background: #2b3b52;
+    transform: translateY(-2px);
+}
+
+/* =========================================================
+   JUEGO
+========================================================= */
+
+#gameScreen {
+    flex-direction: column;
+    max-width: 1250px;
+    margin: auto;
+    gap: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.game-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--primary);
+}
+
+.level {
+    background: var(--panel);
+    border: 1px solid #27364d;
+    padding: 10px 18px;
+    border-radius: 20px;
+    color: var(--warning);
+}
+
+/* =========================================================
+   ESTADISTICAS
+========================================================= */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.stat-card {
+    background: var(--panel);
+    padding: 18px;
+    border-radius: 16px;
+    border: 1px solid #25344b;
+}
+
+.stat-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.stat-name {
+    color: var(--muted);
+    font-size: .85rem;
+}
+
+.stat-value {
+    font-weight: bold;
+}
+
+.bar {
+    height: 10px;
+    background: #070d16;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 20px;
+    transition: width .5s ease;
+}
+
+.empathy {
+    background: linear-gradient(90deg, #00e676, #00e5ff);
+}
+
+.reputation {
+    background: linear-gradient(90deg, #ffc400, #ff7b00);
+}
+
+.toxicity {
+    background: linear-gradient(90deg, #ff8a00, #ff3d71);
+}
+
+/* =========================================================
+   PANEL PRINCIPAL
+========================================================= */
+
+.game-grid {
+    display: grid;
+    grid-template-columns: 1.6fr .9fr;
+    gap: 20px;
+}
+
+.story-panel,
+.side-panel {
+    background: rgba(16,24,39,.9);
+    border: 1px solid #26364d;
+    border-radius: 20px;
+    padding: 25px;
+}
+
+.story-label {
+    color: var(--primary);
+    font-size: .8rem;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.character {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.avatar {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    box-shadow: 0 0 20px rgba(0,229,255,.25);
+}
+
+.character h3 {
+    margin-bottom: 5px;
+}
+
+.character p {
+    color: var(--muted);
+    font-size: .9rem;
+}
+
+.story-text {
+    line-height: 1.8;
+    color: #d7e6f7;
+    font-size: 1.05rem;
+    min-height: 120px;
+}
+
+.choices {
+    margin-top: 25px;
+    display: grid;
+    gap: 12px;
+}
+
+.choice {
+    width: 100%;
+    padding: 15px;
+    text-align: left;
+    border-radius: 12px;
+    background: #172234;
+    color: white;
+    border: 1px solid #2c3e57;
+    position: relative;
+    overflow: hidden;
+}
+
+.choice::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 4px;
+    background: var(--primary);
+}
+
+.choice:hover {
+    transform: translateX(6px);
+    border-color: var(--primary);
+    background: #1c2b40;
+}
+
+/* =========================================================
+   CHAT
+========================================================= */
+
+.chat-title {
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.chat {
+    height: 360px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message {
+    padding: 12px;
+    border-radius: 12px;
+    background: #172234;
+    border-left: 3px solid var(--primary);
+    animation: messageIn .3s ease;
+}
+
+.message.bad {
+    border-color: var(--danger);
+}
+
+.message.good {
+    border-color: var(--success);
+}
+
+.message small {
+    color: var(--muted);
+    display: block;
+    margin-bottom: 5px;
+}
+
+@keyframes messageIn {
+    from {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* =========================================================
+   EVENTO RAPIDO
+========================================================= */
+
+#eventPopup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.75);
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 20;
+}
+
+#eventPopup.show {
+    display: flex;
+}
+
+.event-box {
+    width: min(500px, 100%);
+    background: #101827;
+    border: 1px solid var(--warning);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    animation: popup .3s ease;
+}
+
+@keyframes popup {
+    from {
+        transform: scale(.7);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.timer {
+    font-size: 3rem;
+    color: var(--danger);
+    font-weight: bold;
+    margin: 15px;
+}
+
+/* =========================================================
+   RESULTADOS
+========================================================= */
+
+#resultScreen {
+    justify-content: center;
+    align-items: center;
+}
+
+.result-box {
+    width: min(800px, 100%);
+    text-align: center;
+    background: var(--panel);
+    border-radius: 25px;
+    padding: 40px;
+    border: 1px solid #2c3c55;
+}
+
+.result-icon {
+    font-size: 5rem;
+}
+
+.result-box h1 {
+    margin: 15px 0;
+}
+
+.result-text {
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 600px;
+    margin: auto;
+}
+
+.score-box {
+    margin: 25px 0;
+    padding: 20px;
+    background: #0a111d;
+    border-radius: 15px;
+}
+
+.score {
+    font-size: 3rem;
+    color: var(--primary);
+    font-weight: bold;
+}
+
+/* =========================================================
+   NOTIFICACIONES
+========================================================= */
+
+#notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #152237;
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+    padding: 15px 20px;
+    transform: translateX(150%);
+    transition: .4s;
+    z-index: 30;
+}
+
+#notification.show {
+    transform: translateX(0);
+}
+
+@media(max-width: 850px) {
+
+    .game-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .screen {
+        padding: 15px;
+    }
+
+}
+</style>
+</head>
+
+<body>
+
+<div id="particles"></div>
+
+<div id="notification"></div>
+
+<!-- =====================================================
+     PANTALLA DE INICIO
+===================================================== -->
+
+<section id="startScreen" class="screen active">
+
+    <div class="start-box">
+
+        <div class="logo">CYBER SHIFT</div>
+
+        <h2>El poder de tus palabras</h2>
+
+        <p class="subtitle">
+            Cada mensaje que escribes puede convertirse en una herida
+            o en una oportunidad para ayudar.
+            En este juego tus decisiones cambiarán la historia.
+        </p>
+
+        <input
+            type="text"
+            id="playerName"
+            class="player-input"
+            placeholder="Escribe tu nombre..."
+            maxlength="20"
+        >
+
+        <button class="main-btn" onclick="startGame()">
+            🚀 INICIAR MISIÓN
+        </button>
+
+        <button class="secondary-btn" onclick="showRules()">
+            📖 ¿CÓMO JUGAR?
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     JUEGO
+===================================================== -->
+
+<section id="gameScreen" class="screen">
+
+    <header>
+
+        <div>
+            <div class="game-title">
+                ⚡ CYBER SHIFT
+            </div>
+
+            <small id="welcomeText">
+                Bienvenido
+            </small>
+        </div>
+
+        <div class="level">
+            NIVEL <span id="levelNumber">1</span> / 6
+        </div>
+
+    </header>
+
+
+    <!-- ESTADISTICAS -->
+
+    <div class="stats">
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+                <span class="stat-name">❤️ EMPATÍA</span>
+                <span id="empathyValue">50</span>
+            </div>
+
+            <div class="bar">
+                <div
+                    id="empathyBar"
+                    class="bar-fill empathy"
+                    style="width:50%">
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+                <span class="stat-name">⭐ REPUTACIÓN</span>
+                <span id="reputationValue">50</span>
+            </div>
+
+            <div class="bar">
+                <div
+                    id="reputationBar"
+                    class="bar-fill reputation"
+                    style="width:50%">
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+                <span class="stat-name">🔥 TOXICIDAD</span>
+                <span id="toxicityValue">20</span>
+            </div>
+
+            <div class="bar">
+                <div
+                    id="toxicityBar"
+                    class="bar-fill toxicity"
+                    style="width:20%">
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="game-grid">
+
+        <!-- HISTORIA -->
+
+        <div class="story-panel">
+
+            <div class="story-label">
+                TRANSMISIÓN EN VIVO
+            </div>
+
+            <div class="character">
+
+                <div id="avatar" class="avatar">
+                    👤
+                </div>
+
+                <div>
+
+                    <h3 id="characterName">
+                        CyberCity
+                    </h3>
+
+                    <p id="characterRole">
+                        Red social virtual
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div
+                id="storyText"
+                class="story-text">
+            </div>
+
+            <div
+                id="choices"
+                class="choices">
+            </div>
+
+        </div>
+
+
+        <!-- CHAT -->
+
+        <div class="side-panel">
+
+            <h3 class="chat-title">
+                💬 CHAT DE LA COMUNIDAD
+            </h3>
+
+            <div id="chat" class="chat">
+
+                <div class="message">
+                    <small>CYBERBOT</small>
+                    Tus decisiones aparecerán aquí.
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     EVENTO RAPIDO
+===================================================== -->
+
+<div id="eventPopup">
+
+    <div class="event-box">
+
+        <h2>
+            ⚠️ EVENTO RÁPIDO
+        </h2>
+
+        <p id="eventText">
+        </p>
+
+        <div id="timer" class="timer">
+            5
+        </div>
+
+        <div id="eventChoices">
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     RESULTADO
+===================================================== -->
+
+<section id="resultScreen" class="screen">
+
+    <div class="result-box">
+
+        <div id="resultIcon" class="result-icon">
+            🏆
+        </div>
+
+        <h1 id="resultTitle">
+            MISIÓN COMPLETADA
+        </h1>
+
+        <p id="resultText" class="result-text">
+        </p>
+
+        <div class="score-box">
+
+            <p>PUNTUACIÓN FINAL</p>
+
+            <div id="finalScore" class="score">
+                0
+            </div>
+
+        </div>
+
+        <button class="main-btn" onclick="restartGame()">
+            🔄 JUGAR OTRA VEZ
+        </button>
+
+    </div>
+
+</section>
+
+
+<script>
+
+/* =========================================================
+   VARIABLES DEL JUGADOR
+========================================================= */
+
+let player = {
+    name: "",
+    empathy: 50,
+    reputation: 50,
+    toxicity: 20,
+    level: 0,
+    choices: []
+};
+
+let eventTimer;
+
+
+/* =========================================================
+   HISTORIAS DEL JUEGO
+========================================================= */
+
+const levels = [
+
+{
+    character: "Luna",
+    role: "Nueva estudiante",
+    avatar: "🌙",
+
+    text: `
+    Luna acaba de publicar una foto de un dibujo que hizo.
+    Algunas personas empiezan a burlarse de ella en los comentarios.
+    Uno de tus amigos escribe:
+    "JAJAJA ¿eso es un dibujo o un accidente?"
+    `,
+
+    choices: [
+
+        {
+            text: "😂 Unirme y hacer otro comentario para burlarme.",
+            empathy: -15,
+            reputation: -5,
+            toxicity: 20,
+            type: "bad",
+            chat: "Se unió a las burlas contra Luna."
+        },
+
+        {
+            text: "👀 No decir nada y seguir viendo.",
+            empathy: -5,
+            reputation: 0,
+            toxicity: 5,
+            type: "neutral",
+            chat: "Decidió no intervenir."
+        },
+
+        {
+            text: "🛡️ Defender a Luna y decir que todos pueden aprender.",
+            empathy: 15,
+            reputation: 10,
+            toxicity: -10,
+            type: "good",
+            chat: "Defendió a Luna frente a los comentarios."
+        }
+
+    ]
+},
+
+{
+    character: "Mateo",
+    role: "Compañero de clase",
+    avatar: "🎧",
+
+    text: `
+    Mateo se equivoca durante una presentación.
+    Alguien graba el momento y quiere publicar el video
+    con un título para humillarlo.
+    Te pregunta si debería hacerlo.
+    `,
+
+    choices: [
+
+        {
+            text: "📱 Ayudar a publicar el video para que todos se rían.",
+            empathy: -20,
+            reputation: -10,
+            toxicity: 25,
+            type: "bad",
+            chat: "Ayudó a difundir contenido humillante."
+        },
+
+        {
+            text: "🤷 Decir: 'Haz lo que quieras, no es mi problema'.",
+            empathy: -5,
+            reputation: 0,
+            toxicity: 5,
+            type: "neutral",
+            chat: "No tomó responsabilidad."
+        },
+
+        {
+            text: "🚫 Recomendar no publicarlo y borrar la grabación.",
+            empathy: 20,
+            reputation: 15,
+            toxicity: -15,
+            type: "good",
+            chat: "Evitó que un video humillante fuera publicado."
+        }
+
+    ]
+},
+
+{
+    character: "Nora",
+    role: "Jugadora online",
+    avatar: "🎮",
+
+    text: `
+    En una partida online, Nora pierde varias veces.
+    Otros jugadores comienzan a escribir insultos.
+    Ahora tienes el micrófono abierto.
+    Todos esperan tu reacción.
+    `,
+
+    choices: [
+
+        {
+            text: "🎤 Insultarla también para que abandone la partida.",
+            empathy: -20,
+            reputation: -10,
+            toxicity: 25,
+            type: "bad",
+            chat: "Usó insultos contra otra jugadora."
+        },
+
+        {
+            text: "🔇 Silenciar el chat y no hacer nada más.",
+            empathy: 0,
+            reputation: 0,
+            toxicity: 0,
+            type: "neutral",
+            chat: "Se alejó de la situación."
+        },
+
+        {
+            text: "🤝 Pedir respeto y ayudarla durante la partida.",
+            empathy: 20,
+            reputation: 15,
+            toxicity: -15,
+            type: "good",
+            chat: "Transformó un momento tóxico en trabajo en equipo."
+        }
+
+    ]
+},
+
+{
+    character: "Alex",
+    role: "Moderador de CyberCity",
+    avatar: "🤖",
+
+    text: `
+    Has encontrado una publicación con cientos de comentarios.
+    Algunos parecen bromas, pero otros atacan directamente
+    a una persona por su apariencia.
+
+    Ahora debes decidir qué hacer.
+    `,
+
+    choices: [
+
+        {
+            text: "🔥 Compartir la publicación para conseguir más reacciones.",
+            empathy: -15,
+            reputation: 5,
+            toxicity: 20,
+            type: "bad",
+            chat: "Priorizó las reacciones sobre el daño."
+        },
+
+        {
+            text: "👀 Ignorar los comentarios porque 'solo son bromas'.",
+            empathy: -10,
+            reputation: 0,
+            toxicity: 10,
+            type: "neutral",
+            chat: "Ignoró una situación de acoso."
+        },
+
+        {
+            text: "🚨 Reportar el contenido y apoyar a la persona afectada.",
+            empathy: 20,
+            reputation: 20,
+            toxicity: -20,
+            type: "good",
+            chat: "Reportó el acoso y ofreció apoyo."
+        }
+
+    ]
+},
+
+{
+    character: "Sistema",
+    role: "Análisis de impacto",
+    avatar: "🧠",
+
+    text: `
+    CYBERBOT detecta un patrón.
+
+    Cada comentario ofensivo puede parecer pequeño,
+    pero cuando muchas personas se unen,
+    la situación puede crecer rápidamente.
+
+    ¿Qué aprendizaje eliges llevar contigo?
+    `,
+
+    choices: [
+
+        {
+            text: "😈 'Si todos lo hacen, no importa lo que yo escriba'.",
+            empathy: -20,
+            reputation: -10,
+            toxicity: 20,
+            type: "bad",
+            chat: "Decidió ignorar su responsabilidad individual."
+        },
+
+        {
+            text: "😐 'Mientras no sea yo la víctima, no importa'.",
+            empathy: -10,
+            reputation: 0,
+            toxicity: 10,
+            type: "neutral",
+            chat: "Mostró indiferencia."
+        },
+
+        {
+            text: "💙 'Mis palabras pueden afectar a alguien, así que puedo elegir mejor'.",
+            empathy: 25,
+            reputation: 20,
+            toxicity: -20,
+            type: "good",
+            chat: "Reconoció el impacto de sus propias acciones."
+        }
+
+    ]
+},
+
+{
+    character: "Tu decisión",
+    role: "Última misión",
+    avatar: "⚡",
+
+    text: `
+    Un nuevo usuario está siendo atacado en CyberCity.
+
+    Esta vez nadie te dice qué hacer.
+
+    No hay puntos.
+    No hay recompensas.
+
+    Solo una pregunta:
+
+    ¿Qué tipo de persona quieres ser cuando nadie te obliga
+    a elegir lo correcto?
+    `,
+
+    choices: [
+
+        {
+            text: "🔥 Unirme a los ataques.",
+            empathy: -25,
+            reputation: -10,
+            toxicity: 30,
+            type: "bad",
+            chat: "Eligió participar en el ataque."
+        },
+
+        {
+            text: "🚶 Irme y dejar que otros decidan.",
+            empathy: -5,
+            reputation: 0,
+            toxicity: 5,
+            type: "neutral",
+            chat: "Decidió alejarse."
+        },
+
+        {
+            text: "🛡️ Detener el ataque, reportar y apoyar a la víctima.",
+            empathy: 30,
+            reputation: 25,
+            toxicity: -25,
+            type: "good",
+            chat: "Eligió usar sus acciones para proteger a otra persona."
+        }
+
+    ]
+}
+
+];
+
+
+/* =========================================================
+   INICIAR JUEGO
+========================================================= */
+
+function startGame() {
+
+    const nameInput =
+        document.getElementById("playerName");
+
+    player.name =
+        nameInput.value.trim() || "Jugador";
+
+    document.getElementById("welcomeText").innerText =
+        "Jugador: " + player.name;
+
+    document
+        .getElementById("startScreen")
+        .classList.remove("active");
+
+    document
+        .getElementById("gameScreen")
+        .classList.add("active");
+
+    updateStats();
+
+    loadLevel();
+
+    playSound("start");
+
+}
+
+
+/* =========================================================
+   CARGAR NIVEL
+========================================================= */
+
+function loadLevel() {
+
+    if (player.level >= levels.length) {
+
+        endGame();
+
+        return;
+    }
+
+    const data = levels[player.level];
+
+    document
+        .getElementById("levelNumber")
+        .innerText = player.level + 1;
+
+    document
+        .getElementById("characterName")
+        .innerText = data.character;
+
+    document
+        .getElementById("characterRole")
+        .innerText = data.role;
+
+    document
+        .getElementById("avatar")
+        .innerText = data.avatar;
+
+    typeText(
+        "storyText",
+        data.text
+    );
+
+    const choices =
+        document.getElementById("choices");
+
+    choices.innerHTML = "";
+
+    data.choices.forEach(choice => {
+
+        const button =
+            document.createElement("button");
+
+        button.className = "choice";
+
+        button.innerText =
+            choice.text;
+
+        button.onclick =
+            () => choose(choice);
+
+        choices.appendChild(button);
+
+    });
+
+}
+
+
+/* =========================================================
+   ELEGIR OPCION
+========================================================= */
+
+function choose(choice) {
+
+    playSound(choice.type);
+
+    player.empathy += choice.empathy;
+
+    player.reputation += choice.reputation;
+
+    player.toxicity += choice.toxicity;
+
+    player.empathy =
+        clamp(player.empathy);
+
+    player.reputation =
+        clamp(player.reputation);
+
+    player.toxicity =
+        clamp(player.toxicity);
+
+    player.choices.push(choice.type);
+
+    updateStats();
+
+    addChatMessage(
+        player.name,
+        choice.chat,
+        choice.type
+    );
+
+    showNotification(
+        getReaction(choice)
+    );
+
+    document
+        .getElementById("choices")
+        .innerHTML = "";
+
+    setTimeout(() => {
+
+        player.level++;
+
+        if (
+            player.level === 3
+        ) {
+
+            quickEvent();
+
+        } else {
+
+            loadLevel();
+
+        }
+
+    }, 1200);
+
+}
+
+
+/* =========================================================
+   EVENTO RAPIDO
+========================================================= */
+
+function quickEvent() {
+
+    const popup =
+        document.getElementById("eventPopup");
+
+    const text =
+        document.getElementById("eventText");
+
+    text.innerHTML = `
+        🔥 Un usuario acaba de publicar:
+        <br><br>
+        <b>"Todos contra @Neo"</b>
+        <br><br>
+        El mensaje está empezando a recibir comentarios.
+        ¿Qué haces?
+    `;
+
+    const choices =
+        document.getElementById("eventChoices");
+
+    choices.innerHTML = `
+        <button class="main-btn"
+        onclick="quickChoice('good')">
+        🛡️ Reportar y detener la cadena
+        </button>
+
+        <button class="secondary-btn"
+        onclick="quickChoice('neutral')">
+        👀 Ignorar
+        </button>
+
+        <button class="secondary-btn"
+        onclick="quickChoice('bad')">
+        😂 Compartir
+        </button>
+    `;
+
+    popup.classList.add("show");
+
+    let time = 7;
+
+    document
+        .getElementById("timer")
+        .innerText = time;
+
+    eventTimer = setInterval(() => {
+
+        time--;
+
+        document
+            .getElementById("timer")
+            .innerText = time;
+
+        if (time <= 0) {
+
+            clearInterval(eventTimer);
+
+            quickChoice("neutral");
+
+        }
+
+    }, 1000);
+
+}
+
+
+/* =========================================================
+   RESPUESTA EVENTO
+========================================================= */
+
+function quickChoice(type) {
+
+    clearInterval(eventTimer);
+
+    if (type === "good") {
+
+        player.empathy += 15;
+        player.reputation += 15;
+        player.toxicity -= 15;
+
+        addChatMessage(
+            "CYBERBOT",
+            "La cadena de ataques fue detenida.",
+            "good"
+        );
+
+        playSound("good");
+
+    }
+
+    else if (type === "bad") {
+
+        player.empathy -= 15;
+        player.toxicity += 20;
+
+        addChatMessage(
+            "CYBERBOT",
+            "El contenido comenzó a difundirse más.",
+            "bad"
+        );
+
+        playSound("bad");
+
+    }
+
+    else {
+
+        player.empathy -= 3;
+        player.toxicity += 5;
+
+        addChatMessage(
+            "CYBERBOT",
+            "Nadie intervino a tiempo.",
+            "neutral"
+        );
+
+    }
+
+    player.empathy =
+        clamp(player.empathy);
+
+    player.reputation =
+        clamp(player.reputation);
+
+    player.toxicity =
+        clamp(player.toxicity);
+
+    updateStats();
+
+    document
+        .getElementById("eventPopup")
+        .classList.remove("show");
+
+    player.level++;
+
+    loadLevel();
+
+}
+
+
+/* =========================================================
+   ACTUALIZAR ESTADISTICAS
+========================================================= */
+
+function updateStats() {
+
+    document
+        .getElementById("empathyValue")
+        .innerText = player.empathy;
+
+    document
+        .getElementById("reputationValue")
+        .innerText = player.reputation;
+
+    document
+        .getElementById("toxicityValue")
+        .innerText = player.toxicity;
+
+    document
+        .getElementById("empathyBar")
+        .style.width =
+        player.empathy + "%";
+
+    document
+        .getElementById("reputationBar")
+        .style.width =
+        player.reputation + "%";
+
+    document
+        .getElementById("toxicityBar")
+        .style.width =
+        player.toxicity + "%";
+
+}
+
+
+/* =========================================================
+   CHAT
+========================================================= */
+
+function addChatMessage(
+    user,
+    message,
+    type
+) {
+
+    const chat =
+        document.getElementById("chat");
+
+    const div =
+        document.createElement("div");
+
+    div.className =
+        "message " + type;
+
+    div.innerHTML = `
+        <small>${user}</small>
+        ${message}
+    `;
+
+    chat.appendChild(div);
+
+    chat.scrollTop =
+        chat.scrollHeight;
+
+}
+
+
+/* =========================================================
+   NOTIFICACION
+========================================================= */
+
+function showNotification(text) {
+
+    const notification =
+        document.getElementById("notification");
+
+    notification.innerText =
+        text;
+
+    notification.classList.add("show");
+
+    setTimeout(() => {
+
+        notification.classList.remove("show");
+
+    }, 2200);
+
+}
+
+
+function getReaction(choice) {
+
+    if (choice.type === "good") {
+
+        return "💙 Buena decisión. Tus acciones pueden ayudar.";
+
+    }
+
+    if (choice.type === "bad") {
+
+        return "⚠️ Tus palabras también tienen consecuencias.";
+
+    }
+
+    return "🤔 A veces no actuar también cambia la situación.";
+
+}
+
+
+/* =========================================================
+   FINAL
+========================================================= */
+
+function endGame() {
+
+    document
+        .getElementById("gameScreen")
+        .classList.remove("active");
+
+    document
+        .getElementById("resultScreen")
+        .classList.add("active");
+
+    let score =
+        Math.round(
+            player.empathy * 1.5 +
+            player.reputation -
+            player.toxicity
+        );
+
+    let title;
+    let text;
+    let icon;
+
+    if (
+        player.empathy >= 75 &&
+        player.toxicity <= 30
+    ) {
+
+        title =
+            "🏆 AGENTE DEL CAMBIO";
+
+        icon =
+            "🦸";
+
+        text = `
+        Has demostrado que una persona puede cambiar
+        el ambiente de una comunidad digital.
+
+        Tus decisiones ayudaron a reducir situaciones
+        de ciberbullying.
+
+        Recuerda:
+
+        <b>Detrás de cada pantalla existe una persona real.</b>
+        `;
+
+        createCelebration();
+
+    }
+
+    else if (
+        player.toxicity >= 60
+    ) {
+
+        title =
+            "⚠️ ZONA DE ALERTA";
+
+        icon =
+            "🚨";
+
+        text = `
+        Durante la misión tomaste varias decisiones
+        que aumentaron el daño dentro de CyberCity.
+
+        Pero el juego termina aquí y las decisiones
+        reales siempre pueden cambiar.
+
+        Antes de publicar algo, pregúntate:
+
+        <b>¿Le diría esto a esa persona frente a frente?</b>
+        `;
+
+    }
+
+    else {
+
+        title =
+            "🌱 EN PROCESO DE CAMBIO";
+
+        icon =
+            "🌱";
+
+        text = `
+        Tus decisiones fueron diferentes durante la misión.
+
+        A veces ayudaste.
+        A veces ignoraste.
+        A veces pudiste elegir mejor.
+
+        Lo importante es recordar que cada comentario
+        es una oportunidad para construir
+        una comunidad digital más segura.
+        `;
+
+    }
+
+    document
+        .getElementById("resultTitle")
+        .innerText = title;
+
+    document
+        .getElementById("resultIcon")
+        .innerText = icon;
+
+    document
+        .getElementById("resultText")
+        .innerHTML = text;
+
+    animateScore(score);
+
+}
+
+
+/* =========================================================
+   ANIMAR PUNTUACION
+========================================================= */
+
+function animateScore(target) {
+
+    let current = 0;
+
+    const element =
+        document.getElementById("finalScore");
+
+    const interval =
+        setInterval(() => {
+
+            current += 3;
+
+            if (current >= target) {
+
+                current = target;
+
+                clearInterval(interval);
+
+            }
+
+            element.innerText =
+                current;
+
+        }, 20);
+
+}
+
+
+/* =========================================================
+   CELEBRACION
+========================================================= */
+
+function createCelebration() {
+
+    for (
+        let i = 0;
+        i < 80;
+        i++
+    ) {
+
+        const p =
+            document.createElement("div");
+
+        p.className =
+            "particle";
+
+        p.style.left =
+            Math.random() * 100 + "%";
+
+        p.style.top =
+            Math.random() * 100 + "%";
+
+        p.style.animationDuration =
+            2 + Math.random() * 3 + "s";
+
+        document.body.appendChild(p);
+
+    }
+
+}
+
+
+/* =========================================================
+   EFECTOS DE SONIDO
+========================================================= */
+
+function playSound(type) {
+
+    try {
+
+        const audio =
+            new AudioContext();
+
+        const oscillator =
+            audio.createOscillator();
+
+        const gain =
+            audio.createGain();
+
+        oscillator.connect(gain);
+
+        gain.connect(
+            audio.destination
+        );
+
+        let frequency = 400;
+
+        if (type === "good")
+            frequency = 700;
+
+        if (type === "bad")
+            frequency = 180;
+
+        if (type === "start")
+            frequency = 500;
+
+        oscillator.frequency.value =
+            frequency;
+
+        gain.gain.value =
+            0.08;
+
+        oscillator.start();
+
+        oscillator.stop(
+            audio.currentTime + .15
+        );
+
+    } catch(e) {}
+
+}
+
+
+/* =========================================================
+   TEXTO TIPO MAQUINA
+========================================================= */
+
+function typeText(id, text) {
+
+    const element =
+        document.getElementById(id);
+
+    element.innerHTML = "";
+
+    let i = 0;
+
+    const cleanText =
+        text.trim();
+
+    const interval =
+        setInterval(() => {
+
+            element.innerHTML +=
+                cleanText.charAt(i);
+
+            i++;
+
+            if (
+                i >= cleanText.length
+            ) {
+
+                clearInterval(interval);
+
+            }
+
+        }, 10);
+
+}
+
+
+/* =========================================================
+   PARTICULAS DE FONDO
+========================================================= */
+
+function createParticles() {
+
+    const container =
+        document.getElementById("particles");
+
+    for (
+        let i = 0;
+        i < 45;
+        i++
+    ) {
+
+        const particle =
+            document.createElement("div");
+
+        particle.className =
+            "particle";
+
+        particle.style.left =
+            Math.random() * 100 + "%";
+
+        particle.style.animationDuration =
+            5 + Math.random() * 10 + "s";
+
+        particle.style.animationDelay =
+            Math.random() * 5 + "s";
+
+        container.appendChild(particle);
+
+    }
+
+}
+
+
+/* =========================================================
+   REGLAS
+========================================================= */
+
+function showRules() {
+
+    alert(`
+🎮 CYBER SHIFT
+
+Tu misión es tomar decisiones
+dentro de una comunidad digital.
+
+❤️ EMPATÍA
+Representa cómo tus decisiones
+consideran los sentimientos de otros.
+
+⭐ REPUTACIÓN
+Representa la confianza que generas.
+
+🔥 TOXICIDAD
+Aumenta cuando participas
+en comportamientos dañinos.
+
+Tu objetivo es descubrir
+cómo tus palabras y acciones
+pueden afectar a otras personas.
+    `);
+
+}
+
+
+/* =========================================================
+   REINICIAR
+========================================================= */
+
+function restartGame() {
+
+    player = {
+        name: player.name,
+        empathy: 50,
+        reputation: 50,
+        toxicity: 20,
+        level: 0,
+        choices: []
+    };
+
+    document
+        .getElementById("resultScreen")
+        .classList.remove("active");
+
+    document
+        .getElementById("gameScreen")
+        .classList.add("active");
+
+    document
+        .getElementById("chat")
+        .innerHTML = `
+        <div class="message">
+            <small>CYBERBOT</small>
+            Nueva misión iniciada.
+        </div>
+    `;
+
+    updateStats();
+
+    loadLevel();
+
+}
+
+
+/* =========================================================
+   UTILIDAD
+========================================================= */
+
+function clamp(value) {
+
+    return Math.max(
+        0,
+        Math.min(100, value)
+    );
+
+}
+
+
+/* =========================================================
+   INICIAR FONDO
+========================================================= */
+
+createParticles();
+
+</script>
+
+</body>
+</html>

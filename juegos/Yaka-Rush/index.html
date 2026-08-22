@@ -1,0 +1,3195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Yaku Rush: La Paz</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --cyan:#00eaff;
+    --blue:#087cff;
+    --deep:#031329;
+    --green:#00ff9d;
+    --red:#ff3158;
+    --yellow:#ffe600;
+    --purple:#8a5cff;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:
+        radial-gradient(circle at 50% 0%,#103c70 0%,#06182e 45%,#010711 100%);
+    color:white;
+    min-height:100vh;
+    overflow-x:hidden;
+}
+
+/* =========================
+   PANTALLA DE INICIO
+========================= */
+
+#startScreen{
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:25px;
+    background:
+        linear-gradient(135deg,rgba(0,10,30,.95),rgba(0,60,110,.94)),
+        radial-gradient(circle at center,#00aaff,transparent 50%);
+}
+
+.startBox{
+    width:min(650px,100%);
+    padding:45px;
+    border:1px solid rgba(0,234,255,.4);
+    border-radius:30px;
+    background:rgba(3,18,40,.88);
+    box-shadow:
+        0 0 80px rgba(0,174,255,.25),
+        inset 0 0 40px rgba(0,180,255,.05);
+    text-align:center;
+}
+
+.logo{
+    font-size:clamp(38px,7vw,72px);
+    font-weight:900;
+    letter-spacing:-4px;
+    color:#fff;
+    text-shadow:
+        0 0 10px #00eaff,
+        0 0 30px #008cff;
+}
+
+.subtitle{
+    margin:10px 0 30px;
+    color:#80dfff;
+    font-size:16px;
+}
+
+.inputGroup{
+    text-align:left;
+    margin:18px 0;
+}
+
+.inputGroup label{
+    display:block;
+    margin-bottom:8px;
+    color:#7eeaff;
+    font-weight:bold;
+}
+
+input,select{
+    width:100%;
+    padding:16px;
+    border-radius:12px;
+    border:1px solid rgba(0,234,255,.4);
+    background:#061a31;
+    color:white;
+    outline:none;
+    font-size:16px;
+}
+
+input:focus,select:focus{
+    border-color:#00eaff;
+    box-shadow:0 0 15px rgba(0,234,255,.25);
+}
+
+#musicInput{
+    padding:12px;
+}
+
+.startBtn{
+    margin-top:25px;
+    width:100%;
+    padding:18px;
+    border:0;
+    border-radius:14px;
+    cursor:pointer;
+    color:white;
+    font-size:18px;
+    font-weight:900;
+    background:
+        linear-gradient(90deg,#007cff,#00d9ff);
+    box-shadow:
+        0 0 25px rgba(0,200,255,.35);
+    transition:.2s;
+}
+
+.startBtn:hover{
+    transform:translateY(-2px) scale(1.01);
+    box-shadow:0 0 40px rgba(0,220,255,.55);
+}
+
+.help{
+    margin-top:18px;
+    font-size:12px;
+    color:#6f91ae;
+}
+
+/* =========================
+   JUEGO
+========================= */
+
+#game{
+    display:none;
+    min-height:100vh;
+}
+
+.topbar{
+    height:80px;
+    display:grid;
+    grid-template-columns:1fr 1.5fr 1fr;
+    gap:15px;
+    align-items:center;
+    padding:12px 20px;
+    background:rgba(1,10,24,.9);
+    border-bottom:1px solid rgba(0,234,255,.2);
+    backdrop-filter:blur(12px);
+    position:relative;
+    z-index:20;
+}
+
+.playerInfo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.avatar{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:
+        linear-gradient(135deg,#00eaff,#0066ff);
+    font-size:23px;
+    box-shadow:0 0 20px rgba(0,220,255,.5);
+}
+
+.playerName{
+    font-weight:900;
+}
+
+.university{
+    font-size:11px;
+    color:#6dc8e9;
+    margin-top:3px;
+}
+
+.scoreBox{
+    text-align:center;
+}
+
+.scoreLabel{
+    color:#6d9dbb;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:2px;
+}
+
+.score{
+    font-size:29px;
+    font-weight:900;
+    color:#00f1ff;
+    text-shadow:0 0 15px #00eaff;
+}
+
+.stats{
+    display:flex;
+    justify-content:flex-end;
+    gap:15px;
+}
+
+.stat{
+    min-width:85px;
+    text-align:center;
+}
+
+.statLabel{
+    font-size:9px;
+    color:#6588a1;
+}
+
+.statValue{
+    font-weight:900;
+    font-size:17px;
+}
+
+#errors{
+    color:#ff5574;
+}
+
+#waterSaved{
+    color:#00ffb0;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+
+.main{
+    display:grid;
+    grid-template-columns:260px minmax(400px,1fr) 260px;
+    min-height:calc(100vh - 80px);
+}
+
+/* =========================
+   RANKING
+========================= */
+
+.side{
+    padding:20px;
+    background:rgba(1,12,26,.65);
+    border-right:1px solid rgba(0,234,255,.1);
+}
+
+.side.right{
+    border-right:0;
+    border-left:1px solid rgba(0,234,255,.1);
+}
+
+.panel{
+    background:rgba(5,25,46,.8);
+    border:1px solid rgba(0,234,255,.13);
+    border-radius:18px;
+    padding:18px;
+    margin-bottom:18px;
+}
+
+.panelTitle{
+    color:#8adff4;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    margin-bottom:15px;
+}
+
+.rankItem{
+    display:grid;
+    grid-template-columns:30px 1fr 50px;
+    align-items:center;
+    gap:7px;
+    padding:11px 5px;
+    border-bottom:1px solid rgba(255,255,255,.05);
+    font-size:12px;
+}
+
+.rankItem:last-child{
+    border-bottom:0;
+}
+
+.rankPos{
+    color:#6b91a9;
+    font-weight:bold;
+}
+
+.rankItem.you{
+    background:rgba(0,225,255,.1);
+    border-radius:9px;
+    color:#00f1ff;
+}
+
+.rankPoints{
+    text-align:right;
+    color:#78d5ed;
+}
+
+/* =========================
+   ESCENARIO
+========================= */
+
+.stage{
+    position:relative;
+    overflow:hidden;
+    min-height:calc(100vh - 80px);
+    background:
+        linear-gradient(to bottom,
+        #061d39 0%,
+        #0b3960 48%,
+        #02101f 49%,
+        #020a14 100%);
+}
+
+/* estrellas */
+.stage::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:
+        radial-gradient(circle,#fff 1px,transparent 1px),
+        radial-gradient(circle,#7beaff 1px,transparent 1px);
+    background-size:90px 90px,130px 130px;
+    background-position:0 0,30px 40px;
+    opacity:.12;
+}
+
+/* montañas */
+.mountains{
+    position:absolute;
+    bottom:220px;
+    left:0;
+    width:100%;
+    height:230px;
+    background:
+        linear-gradient(135deg,transparent 49%,#071523 50%) 0 0/40% 100%,
+        linear-gradient(45deg,transparent 49%,#0b1d31 50%) 100% 0/50% 100%;
+    opacity:.8;
+}
+
+/* Illimani */
+.illimani{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:210px;
+    width:350px;
+    height:230px;
+    clip-path:polygon(
+        0 100%,
+        16% 65%,
+        29% 75%,
+        50% 8%,
+        70% 72%,
+        84% 58%,
+        100% 100%
+    );
+    background:
+        linear-gradient(135deg,#edfaff 0 20%,#b4e7fa 21% 35%,#214d70 36% 100%);
+    filter:drop-shadow(0 0 20px rgba(180,235,255,.3));
+}
+
+/* edificio */
+.building{
+    position:absolute;
+    bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(850px,85%);
+    height:230px;
+    background:
+        linear-gradient(90deg,
+        #111b27 0 15%,
+        #172536 15% 17%,
+        #111b27 17% 32%,
+        #172536 32% 34%,
+        #111b27 34% 48%,
+        #172536 48% 50%,
+        #111b27 50% 65%,
+        #172536 65% 67%,
+        #111b27 67% 82%,
+        #172536 82% 84%,
+        #111b27 84%);
+    border-top:3px solid #253b52;
+}
+
+/* ventanas */
+.windows{
+    position:absolute;
+    inset:15px;
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    gap:12px;
+}
+
+.window{
+    height:45px;
+    background:#ffe87a;
+    opacity:.45;
+    border:2px solid #172638;
+    box-shadow:0 0 10px rgba(255,230,100,.2);
+}
+
+.window:nth-child(3n){
+    opacity:.1;
+}
+
+/* =========================
+   PILA
+========================= */
+
+.faucet{
+    position:absolute;
+    right:11%;
+    bottom:200px;
+    width:180px;
+    height:100px;
+    z-index:8;
+}
+
+.faucetBody{
+    position:absolute;
+    right:20px;
+    top:15px;
+    width:90px;
+    height:35px;
+    border:12px solid #a9c1ce;
+    border-bottom:0;
+    border-radius:30px 30px 0 0;
+}
+
+.faucetBody::after{
+    content:"";
+    position:absolute;
+    right:-28px;
+    top:22px;
+    width:38px;
+    height:13px;
+    background:#a9c1ce;
+    border-radius:5px;
+}
+
+.faucetHandle{
+    position:absolute;
+    right:55px;
+    top:0;
+    width:30px;
+    height:22px;
+    background:#d9edf5;
+    border-radius:8px;
+}
+
+.sink{
+    position:absolute;
+    bottom:0;
+    right:0;
+    width:180px;
+    height:45px;
+    background:linear-gradient(#d7eef6,#7999a8);
+    border-radius:8px 8px 25px 25px;
+}
+
+.waterStream{
+    position:absolute;
+    right:12px;
+    top:58px;
+    width:13px;
+    height:120px;
+    background:linear-gradient(to bottom,
+        rgba(0,225,255,.8),
+        rgba(0,110,255,.3));
+    border-radius:20px;
+    animation:stream .3s infinite;
+}
+
+@keyframes stream{
+    0%,100%{opacity:.8}
+    50%{opacity:.35}
+}
+
+.waterDrop{
+    position:absolute;
+    right:9px;
+    top:170px;
+    width:19px;
+    height:27px;
+    border-radius:60% 60% 60% 0;
+    transform:rotate(-45deg);
+    background:#00d9ff;
+    box-shadow:0 0 15px #00eaff;
+    animation:drop .7s infinite;
+}
+
+@keyframes drop{
+    from{transform:translateY(0) rotate(-45deg)}
+    to{transform:translateY(80px) rotate(-45deg)}
+}
+
+/* =========================
+   TRACK / GUITAR HERO
+========================= */
+
+.track{
+    position:absolute;
+    top:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(650px,90%);
+    height:100%;
+    overflow:hidden;
+    perspective:700px;
+}
+
+.trackGlow{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:260px;
+    background:
+        linear-gradient(to top,
+        rgba(0,220,255,.13),
+        transparent);
+}
+
+.lane{
+    position:absolute;
+    bottom:0;
+    height:100%;
+    width:20%;
+    border-left:1px solid rgba(0,234,255,.08);
+    border-right:1px solid rgba(0,234,255,.04);
+}
+
+.lane:nth-child(1){left:0}
+.lane:nth-child(2){left:20%}
+.lane:nth-child(3){left:40%}
+.lane:nth-child(4){left:60%}
+.lane:nth-child(5){left:80%}
+
+.hitLine{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:135px;
+    height:6px;
+    background:#00eaff;
+    box-shadow:
+        0 0 8px #00eaff,
+        0 0 25px #00eaff;
+    z-index:10;
+}
+
+.hitButtons{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:50px;
+    height:65px;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:7px;
+    z-index:12;
+}
+
+.hitBtn{
+    border:2px solid rgba(0,234,255,.4);
+    border-radius:14px;
+    background:rgba(0,40,70,.75);
+    color:#00eaff;
+    font-size:24px;
+    cursor:pointer;
+    transition:.08s;
+}
+
+.hitBtn:active,
+.hitBtn.active{
+    transform:scale(.92);
+    background:#00eaff;
+    color:#00101d;
+    box-shadow:0 0 35px #00eaff;
+}
+
+.laneKey{
+    font-size:11px;
+    color:#5a90a7;
+    display:block;
+    margin-top:3px;
+}
+
+/* GOTA */
+
+.note{
+    position:absolute;
+    width:40px;
+    height:50px;
+    z-index:7;
+    transform:translateX(-50%);
+    pointer-events:none;
+}
+
+.noteShape{
+    width:35px;
+    height:35px;
+    border-radius:60% 60% 60% 0;
+    transform:rotate(-45deg);
+    background:
+        radial-gradient(circle at 30% 25%,#fff 0 5%,#7ff7ff 6% 20%,#00c8ff 40%,#0070ff 100%);
+    box-shadow:
+        0 0 10px #00eaff,
+        0 0 30px rgba(0,210,255,.8);
+}
+
+.note.good{
+    animation:goodHit .25s forwards;
+}
+
+@keyframes goodHit{
+    to{
+        transform:translateX(-50%) scale(2);
+        opacity:0;
+    }
+}
+
+/* =========================
+   CONTADOR DE AGUA
+========================= */
+
+.waterHUD{
+    position:absolute;
+    top:18px;
+    left:18px;
+    z-index:15;
+    width:220px;
+    background:rgba(2,18,35,.8);
+    padding:14px;
+    border:1px solid rgba(0,234,255,.2);
+    border-radius:14px;
+    backdrop-filter:blur(8px);
+}
+
+.waterTitle{
+    font-size:10px;
+    color:#75aac1;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.waterNumber{
+    font-size:30px;
+    font-weight:900;
+    color:#00ffb0;
+}
+
+.reserveBar{
+    height:9px;
+    background:#092237;
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:8px;
+}
+
+.reserveFill{
+    height:100%;
+    width:85%;
+    background:linear-gradient(90deg,#00c8ff,#00ff9d);
+    box-shadow:0 0 15px #00eaff;
+    transition:.3s;
+}
+
+/* =========================
+   MENSAJES
+========================= */
+
+.message{
+    position:absolute;
+    left:50%;
+    top:32%;
+    transform:translate(-50%,-50%) scale(.7);
+    z-index:100;
+    width:min(500px,90%);
+    padding:25px;
+    border-radius:20px;
+    text-align:center;
+    background:
+        linear-gradient(135deg,rgba(0,75,120,.96),rgba(2,15,35,.96));
+    border:1px solid #00eaff;
+    box-shadow:
+        0 0 60px rgba(0,210,255,.35);
+    opacity:0;
+    pointer-events:none;
+}
+
+.message.show{
+    animation:messageIn .5s forwards;
+}
+
+@keyframes messageIn{
+    0%{
+        opacity:0;
+        transform:translate(-50%,-50%) scale(.7);
+    }
+    100%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1);
+    }
+}
+
+.messageIcon{
+    font-size:45px;
+    margin-bottom:10px;
+}
+
+.message h2{
+    color:#00f1ff;
+    margin-bottom:8px;
+}
+
+.message p{
+    color:#d6f8ff;
+    line-height:1.5;
+}
+
+/* feedback */
+.feedback{
+    position:absolute;
+    z-index:200;
+    pointer-events:none;
+    font-size:20px;
+    font-weight:900;
+    animation:floatFeedback .9s forwards;
+}
+
+.feedback.good{
+    color:#00ffb0;
+    text-shadow:0 0 15px #00ffb0;
+}
+
+.feedback.bad{
+    color:#ff3e65;
+}
+
+@keyframes floatFeedback{
+    from{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+    to{
+        opacity:0;
+        transform:translateY(-70px) scale(1.3);
+    }
+}
+
+/* =========================
+   PANEL DERECHO
+========================= */
+
+.waterMeter{
+    width:150px;
+    height:150px;
+    margin:auto;
+    border-radius:50%;
+    border:7px solid #0d3b58;
+    position:relative;
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+    background:#02111f;
+}
+
+.meterWater{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:82%;
+    background:
+        linear-gradient(#00d9ff,#006cff);
+    opacity:.75;
+    transition:.5s;
+}
+
+.meterValue{
+    position:relative;
+    z-index:2;
+    font-size:30px;
+    font-weight:900;
+}
+
+.miniStat{
+    display:flex;
+    justify-content:space-between;
+    padding:9px 0;
+    border-bottom:1px solid rgba(255,255,255,.05);
+    font-size:12px;
+}
+
+.miniStat span:last-child{
+    color:#00eaff;
+    font-weight:bold;
+}
+
+/* =========================
+   BOTONES
+========================= */
+
+.controlRow{
+    position:absolute;
+    top:18px;
+    right:18px;
+    z-index:30;
+    display:flex;
+    gap:7px;
+}
+
+.control{
+    background:rgba(2,20,35,.8);
+    color:#8cdcec;
+    border:1px solid rgba(0,234,255,.2);
+    padding:9px 12px;
+    border-radius:9px;
+    cursor:pointer;
+}
+
+/* =========================
+   MODAL FINAL
+========================= */
+
+#gameOver{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:999;
+    background:rgba(0,5,15,.93);
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.finalBox{
+    width:min(600px,100%);
+    background:#061a30;
+    border:1px solid #00eaff;
+    border-radius:25px;
+    padding:40px;
+    text-align:center;
+    box-shadow:0 0 80px rgba(0,220,255,.25);
+}
+
+.finalScore{
+    font-size:60px;
+    font-weight:900;
+    color:#00eaff;
+    margin:15px;
+}
+
+.restart{
+    border:0;
+    background:#00bfff;
+    color:#00101b;
+    font-weight:900;
+    padding:15px 30px;
+    border-radius:12px;
+    cursor:pointer;
+}
+
+/* responsive */
+
+@media(max-width:1000px){
+    .main{
+        grid-template-columns:1fr;
+    }
+
+    .side{
+        display:none;
+    }
+
+    .stage{
+        min-height:calc(100vh - 80px);
+    }
+
+    .topbar{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .stats{
+        display:none;
+    }
+
+    .faucet{
+        right:3%;
+        transform:scale(.7);
+        transform-origin:bottom right;
+    }
+}
+
+@media(max-width:600px){
+    .startBox{
+        padding:28px 20px;
+    }
+
+    .logo{
+        letter-spacing:-2px;
+    }
+
+    .waterHUD{
+        width:170px;
+    }
+
+    .track{
+        width:100%;
+    }
+
+    .hitButtons{
+        bottom:35px;
+    }
+
+    .hitLine{
+        bottom:110px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     INICIO
+========================= -->
+
+<section id="startScreen">
+
+<div class="startBox">
+
+    <div class="logo">YAKU RUSH</div>
+
+    <div class="subtitle">
+        LA PAZ · RHYTHM WATER CHALLENGE
+    </div>
+
+    <div class="inputGroup">
+        <label>👤 Nombre del jugador</label>
+        <input id="playerName"
+               type="text"
+               maxlength="20"
+               placeholder="Escribe tu nombre">
+    </div>
+
+    <div class="inputGroup">
+        <label>🎓 Universidad</label>
+
+        <select id="university">
+            <option>Universidad Mayor de San Andrés (UMSA)</option>
+            <option>Universidad Católica Boliviana (UCB)</option>
+            <option>Universidad Privada Boliviana (UPB)</option>
+            <option>Universidad de Aquino Bolivia (UDABOL)</option>
+            <option>Universidad Franz Tamayo (UNIFRANZ)</option>
+            <option>Universidad Tecnológica Boliviana (UTB)</option>
+            <option>Universidad Salesiana de Bolivia (USB)</option>
+            <option>Universidad Central de Bolivia (UNICEN)</option>
+        </select>
+    </div>
+
+    <div class="inputGroup">
+        <label>🎵 Sube tu música</label>
+
+        <input id="musicInput"
+               type="file"
+               accept="audio/*">
+    </div>
+
+    <button class="startBtn" onclick="startGame()">
+        💧 INICIAR YAKU RUSH
+    </button>
+
+    <div class="help">
+        Las gotas caerán siguiendo el ritmo de tu música.
+        Presiona las gotas cuando lleguen a la línea.
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     JUEGO
+========================= -->
+
+<section id="game">
+
+<header class="topbar">
+
+    <div class="playerInfo">
+
+        <div class="avatar">💧</div>
+
+        <div>
+            <div class="playerName" id="uiName">Jugador</div>
+            <div class="university" id="uiUniversity">UMSA</div>
+        </div>
+
+    </div>
+
+    <div class="scoreBox">
+
+        <div class="scoreLabel">
+            YAKU SCORE
+        </div>
+
+        <div class="score" id="score">
+            000000
+        </div>
+
+    </div>
+
+    <div class="stats">
+
+        <div class="stat">
+            <div class="statLabel">ERRORES</div>
+            <div class="statValue" id="errors">
+                0 / 5
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="statLabel">AGUA</div>
+            <div class="statValue" id="waterSaved">
+                0 L
+            </div>
+        </div>
+
+    </div>
+
+</header>
+
+
+<div class="main">
+
+<!-- =========================
+     RANKING IZQUIERDO
+========================= -->
+
+<aside class="side">
+
+    <div class="panel">
+
+        <div class="panelTitle">
+            🏆 Ranking Paceño
+        </div>
+
+        <div id="ranking"></div>
+
+    </div>
+
+    <div class="panel">
+
+        <div class="panelTitle">
+            🎯 Tu progreso
+        </div>
+
+        <div class="miniStat">
+            <span>Posición</span>
+            <span id="position">#5</span>
+        </div>
+
+        <div class="miniStat">
+            <span>Combo</span>
+            <span id="combo">x0</span>
+        </div>
+
+        <div class="miniStat">
+            <span>Precisión</span>
+            <span id="accuracy">100%</span>
+        </div>
+
+    </div>
+
+</aside>
+
+
+<!-- =========================
+     ESCENARIO
+========================= -->
+
+<main class="stage">
+
+    <div class="controlRow">
+        <button class="control" onclick="toggleMusic()">
+            🎵 Música
+        </button>
+
+        <button class="control" onclick="pauseGame()">
+            ⏸ Pausa
+        </button>
+    </div>
+
+
+    <!-- HUD AGUA -->
+
+    <div class="waterHUD">
+
+        <div class="waterTitle">
+            Reserva de Sopocachi
+        </div>
+
+        <div class="waterNumber">
+            <span id="reserve">85</span>%
+        </div>
+
+        <div class="reserveBar">
+            <div class="reserveFill"
+                 id="reserveFill">
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="mountains"></div>
+
+    <div class="illimani"></div>
+
+
+    <!-- EDIFICIOS -->
+
+    <div class="building">
+
+        <div class="windows">
+
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+            <div class="window"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PILA -->
+
+    <div class="faucet">
+
+        <div class="faucetHandle"></div>
+
+        <div class="faucetBody"></div>
+
+        <div class="waterStream"
+             id="waterStream">
+        </div>
+
+        <div class="waterDrop"></div>
+
+        <div class="sink"></div>
+
+    </div>
+
+
+    <!-- =====================
+         TRACK
+    ====================== -->
+
+    <div class="track" id="track">
+
+        <div class="trackGlow"></div>
+
+        <div class="lane"></div>
+        <div class="lane"></div>
+        <div class="lane"></div>
+        <div class="lane"></div>
+        <div class="lane"></div>
+
+        <div class="hitLine"></div>
+
+        <div class="hitButtons">
+
+            <button class="hitBtn"
+                    data-lane="0"
+                    onclick="hitLane(0)">
+                💧
+                <span class="laneKey">A</span>
+            </button>
+
+            <button class="hitBtn"
+                    data-lane="1"
+                    onclick="hitLane(1)">
+                💧
+                <span class="laneKey">S</span>
+            </button>
+
+            <button class="hitBtn"
+                    data-lane="2"
+                    onclick="hitLane(2)">
+                💧
+                <span class="laneKey">D</span>
+            </button>
+
+            <button class="hitBtn"
+                    data-lane="3"
+                    onclick="hitLane(3)">
+                💧
+                <span class="laneKey">F</span>
+            </button>
+
+            <button class="hitBtn"
+                    data-lane="4"
+                    onclick="hitLane(4)">
+                💧
+                <span class="laneKey">G</span>
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- MENSAJE EDUCATIVO -->
+
+    <div class="message" id="waterMessage">
+
+        <div class="messageIcon">💧</div>
+
+        <h2>CUIDEMOS EL AGUA</h2>
+
+        <p id="messageText"></p>
+
+    </div>
+
+</main>
+
+
+<!-- =========================
+     DERECHA
+========================= -->
+
+<aside class="side right">
+
+    <div class="panel">
+
+        <div class="panelTitle">
+            💧 Reserva hídrica
+        </div>
+
+        <div class="waterMeter">
+
+            <div class="meterWater"
+                 id="meterWater">
+            </div>
+
+            <div class="meterValue">
+                <span id="meterValue">85</span>%
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <div class="panelTitle">
+            📊 Estadísticas
+        </div>
+
+        <div class="miniStat">
+            <span>Gotas tocadas</span>
+            <span id="hits">0</span>
+        </div>
+
+        <div class="miniStat">
+            <span>Gotas perdidas</span>
+            <span id="missed">0</span>
+        </div>
+
+        <div class="miniStat">
+            <span>Litros ahorrados</span>
+            <span id="liters">0</span>
+        </div>
+
+        <div class="miniStat">
+            <span>Mejor combo</span>
+            <span id="bestCombo">0</span>
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <div class="panelTitle">
+            🎵 Sincronización
+        </div>
+
+        <div class="miniStat">
+            <span>Estado</span>
+            <span id="musicStatus">LISTO</span>
+        </div>
+
+        <div class="miniStat">
+            <span>Tiempo</span>
+            <span id="musicTime">0:00</span>
+        </div>
+
+    </div>
+
+</aside>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     GAME OVER
+========================= -->
+
+<div id="gameOver">
+
+    <div class="finalBox">
+
+        <div style="font-size:50px">
+            💧
+        </div>
+
+        <h1>¡FIN DE LA PARTIDA!</h1>
+
+        <p style="color:#79b4c9;margin-top:10px">
+            El agua de Sopocachi necesita un guardián.
+        </p>
+
+        <div class="finalScore"
+             id="finalScore">
+            0
+        </div>
+
+        <div id="finalStats"></div>
+
+        <br>
+
+        <button class="restart"
+                onclick="location.reload()">
+            🔄 JUGAR DE NUEVO
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   YAKU RUSH
+   SISTEMA PRINCIPAL
+===================================================== */
+
+
+/* =========================
+   VARIABLES
+========================= */
+
+let audio = null;
+let audioURL = null;
+
+let playing = false;
+let paused = false;
+
+let score = 0;
+let hits = 0;
+let missed = 0;
+
+let errors = 0;
+
+let waterSaved = 0;
+
+let combo = 0;
+let bestCombo = 0;
+
+let reserve = 85;
+
+let totalNotes = 0;
+
+let messageCounter = 0;
+
+let lastNoteTime = 0;
+
+let animationFrame;
+
+
+/*
+    IMPORTANTE:
+
+    Aquí se define la sensibilidad de la
+    sincronización de las gotas.
+
+    Las gotas se generan en función del
+    audio que sube el jugador.
+
+    El navegador no puede conocer de forma
+    perfecta cada golpe individual de una
+    guitarra/bajo de cualquier canción sin
+    hacer análisis avanzado de audio.
+
+    Por eso usamos análisis de energía:
+    bass + medios + agudos.
+
+    El resultado se siente como un juego
+    rítmico y las gotas reaccionan a los
+    cambios de la música.
+*/
+
+const analyser = new (window.AudioContext ||
+                      window.webkitAudioContext)();
+
+let sourceNode = null;
+let analyserNode = null;
+
+let frequencyData = null;
+
+let lastEnergy = 0;
+
+let energyCooldown = 0;
+
+
+/* =========================
+   MENSAJES DE AGUA
+========================= */
+
+const waterMessages = [
+
+    "RECUERDA: NO DEJES ABIERTA TU PILA CUANDO NO LA ESTÉS UTILIZANDO.",
+
+    "CADA GOTA CUENTA. CIERRA EL GRIFO MIENTRAS TE CEPILLAS LOS DIENTES.",
+
+    "UNA DUCHA MÁS CORTA PUEDE AHORRAR MUCHOS LITROS DE AGUA.",
+
+    "REPARA LAS FUGAS DE TU CASA. UNA PEQUEÑA FUGA PUEDE DESPERDICIAR MUCHA AGUA.",
+
+    "NO USES AGUA POTABLE PARA LIMPIAR LA CALLE O LA ACERA.",
+
+    "UTILIZA SOLO EL AGUA QUE NECESITAS. EVITA EL DESPERDICIO.",
+
+    "CUIDAR EL AGUA HOY SIGNIFICA TENER AGUA PARA MAÑANA.",
+
+    "SI VES UNA PILA ABIERTA O UNA FUGA, CIÉRRALA O REPÓRTALA.",
+
+    "APROVECHA EL AGUA DE FORMA RESPONSABLE. CADA LITRO IMPORTA.",
+
+    "EL AGUA ES VIDA. PROTEGERLA ES RESPONSABILIDAD DE TODOS."
+
+];
+
+
+/* =========================
+   UNIVERSIDADES
+========================= */
+
+const universities = [
+
+    "Universidad Mayor de San Andrés (UMSA)",
+
+    "Universidad Católica Boliviana (UCB)",
+
+    "Universidad Privada Boliviana (UPB)",
+
+    "Universidad Franz Tamayo (UNIFRANZ)",
+
+    "Universidad de Aquino Bolivia (UDABOL)",
+
+    "Universidad Tecnológica Boliviana (UTB)",
+
+    "Universidad Salesiana de Bolivia (USB)",
+
+    "Universidad Central de Bolivia (UNICEN)"
+
+];
+
+
+/* =========================
+   RANKING
+========================= */
+
+let ranking = [
+
+    {
+        university:"UMSA",
+        points:8420
+    },
+
+    {
+        university:"UCB",
+        points:7980
+    },
+
+    {
+        university:"UPB",
+        points:7460
+    },
+
+    {
+        university:"UNIFRANZ",
+        points:6980
+    },
+
+    {
+        university:"UDABOL",
+        points:6510
+    },
+
+    {
+        university:"UTB",
+        points:6020
+    },
+
+    {
+        university:"USB",
+        points:5710
+    },
+
+    {
+        university:"UNICEN",
+        points:5350
+    }
+
+];
+
+
+/* =========================
+   INICIO
+========================= */
+
+function startGame(){
+
+    const name =
+        document.getElementById("playerName")
+        .value
+        .trim();
+
+    const university =
+        document.getElementById("university")
+        .value;
+
+    const music =
+        document.getElementById("musicInput")
+        .files[0];
+
+
+    if(!name){
+
+        alert("Escribe tu nombre para comenzar.");
+
+        return;
+    }
+
+
+    if(!music){
+
+        alert("Selecciona una canción para jugar.");
+
+        return;
+    }
+
+
+    document.getElementById("uiName")
+        .textContent = name;
+
+
+    document.getElementById("uiUniversity")
+        .textContent = university;
+
+
+    /*
+       Insertar al jugador en ranking
+    */
+
+    const shortName =
+        getShortUniversity(university);
+
+
+    ranking.push({
+
+        university:shortName,
+
+        points:0,
+
+        player:true
+
+    });
+
+
+    renderRanking();
+
+
+    /*
+       Cargar música
+    */
+
+    audioURL =
+        URL.createObjectURL(music);
+
+
+    audio =
+        new Audio(audioURL);
+
+
+    audio.crossOrigin="anonymous";
+
+
+    /*
+       Configurar Web Audio
+    */
+
+    try{
+
+        sourceNode =
+            analyser.createMediaElementSource(audio);
+
+
+        analyserNode =
+            analyser.createAnalyser();
+
+
+        analyserNode.fftSize=512;
+
+        analyserNode.smoothingTimeConstant=.72;
+
+
+        sourceNode.connect(analyserNode);
+
+        analyserNode.connect(analyser.destination);
+
+
+        frequencyData =
+            new Uint8Array(
+                analyserNode.frequencyBinCount
+            );
+
+    }catch(e){
+
+        console.log(
+            "Audio analyser:",
+            e
+        );
+
+    }
+
+
+    /*
+       Pantalla
+    */
+
+    document.getElementById("startScreen")
+        .style.display="none";
+
+
+    document.getElementById("game")
+        .style.display="block";
+
+
+    /*
+       Iniciar
+    */
+
+    playing=true;
+
+    paused=false;
+
+
+    audio.play()
+        .then(()=>{
+
+            document.getElementById("musicStatus")
+                .textContent="▶ REPRODUCIENDO";
+
+        })
+        .catch(()=>{
+
+            document.getElementById("musicStatus")
+                .textContent="CLICK PARA REPRODUCIR";
+
+        });
+
+
+    /*
+       Bucle
+    */
+
+    requestAnimationFrame(gameLoop);
+
+}
+
+
+/* =========================
+   NOMBRE CORTO
+========================= */
+
+function getShortUniversity(name){
+
+    if(name.includes("San Andrés"))
+        return "UMSA";
+
+    if(name.includes("Católica"))
+        return "UCB";
+
+    if(name.includes("Privada Boliviana"))
+        return "UPB";
+
+    if(name.includes("Franz"))
+        return "UNIFRANZ";
+
+    if(name.includes("Aquino"))
+        return "UDABOL";
+
+    if(name.includes("Tecnológica"))
+        return "UTB";
+
+    if(name.includes("Salesiana"))
+        return "USB";
+
+    return "UNICEN";
+
+}
+
+
+/* =========================
+   RANKING VISUAL
+========================= */
+
+function renderRanking(){
+
+    const container =
+        document.getElementById("ranking");
+
+
+    /*
+       Ordenar por puntos
+    */
+
+    ranking.sort(
+        (a,b)=>b.points-a.points
+    );
+
+
+    container.innerHTML="";
+
+
+    ranking.forEach((item,index)=>{
+
+        const div =
+            document.createElement("div");
+
+
+        div.className =
+            "rankItem";
+
+
+        if(item.player)
+            div.classList.add("you");
+
+
+        div.innerHTML=`
+
+            <div class="rankPos">
+                ${index+1}
+            </div>
+
+            <div>
+                ${item.university}
+            </div>
+
+            <div class="rankPoints">
+                ${item.points}
+            </div>
+
+        `;
+
+
+        container.appendChild(div);
+
+
+        /*
+           Posición del jugador
+        */
+
+        if(item.player){
+
+            document.getElementById("position")
+                .textContent =
+                "#"+(index+1);
+
+        }
+
+    });
+
+}
+
+
+/* =========================
+   BUCLE PRINCIPAL
+========================= */
+
+function gameLoop(){
+
+    if(!playing){
+
+        return;
+
+    }
+
+
+    if(!paused){
+
+        analyseMusic();
+
+        updateNotes();
+
+        updateMusicTime();
+
+    }
+
+
+    animationFrame =
+        requestAnimationFrame(gameLoop);
+
+}
+
+
+/* =========================
+   ANALIZAR MÚSICA
+========================= */
+
+function analyseMusic(){
+
+    if(!analyserNode ||
+       !frequencyData ||
+       !audio ||
+       audio.paused){
+
+        return;
+
+    }
+
+
+    analyserNode.getByteFrequencyData(
+        frequencyData
+    );
+
+
+    /*
+       Dividimos el espectro:
+
+       0 - 25%     bajos
+       25 - 65%    medios
+       65 - 100%   agudos
+
+       Así las gotas pueden aparecer
+       reaccionando a distintas partes
+       de la música.
+    */
+
+
+    let bass=0;
+    let mids=0;
+    let highs=0;
+
+
+    const length =
+        frequencyData.length;
+
+
+    for(
+        let i=0;
+        i<length;
+        i++
+    ){
+
+        const value =
+            frequencyData[i];
+
+
+        if(i < length*.25){
+
+            bass+=value;
+
+        }else if(i < length*.65){
+
+            mids+=value;
+
+        }else{
+
+            highs+=value;
+
+        }
+
+    }
+
+
+    bass/=(length*.25);
+    mids/=(length*.40);
+    highs/=(length*.35);
+
+
+    /*
+       Energía general
+    */
+
+    const energy =
+        (bass*.45)+(mids*.35)+(highs*.20);
+
+
+    /*
+       Detectar golpe musical.
+
+       No creamos cientos de gotas.
+       Usamos cooldown para que sea jugable.
+    */
+
+    const threshold =
+        105;
+
+
+    const now =
+        performance.now();
+
+
+    if(
+        energy > threshold &&
+        energy > lastEnergy*1.08 &&
+        now > energyCooldown
+    ){
+
+        /*
+           Determinar carril según
+           la parte dominante.
+        */
+
+        let lane;
+
+
+        if(bass > mids && bass > highs){
+
+            lane =
+                Math.floor(Math.random()*2);
+
+        }else if(mids > highs){
+
+            lane =
+                1+
+                Math.floor(
+                    Math.random()*3
+                );
+
+        }else{
+
+            lane =
+                3+
+                Math.floor(
+                    Math.random()*2
+                );
+
+        }
+
+
+        createNote(lane);
+
+
+        /*
+           Cooldown dinámico
+        */
+
+        energyCooldown =
+            now +
+            Math.max(
+                160,
+                430-(energy*.8)
+            );
+
+    }
+
+
+    lastEnergy =
+        energy;
+
+}
+
+
+/* =========================
+   CREAR GOTA
+========================= */
+
+function createNote(lane){
+
+    const note =
+        document.createElement("div");
+
+
+    note.className="note";
+
+
+    note.dataset.lane=lane;
+
+
+    /*
+       La nota comienza arriba
+    */
+
+    note.style.left =
+        ((lane+.5)*20)+"%";
+
+
+    note.style.top =
+        "-60px";
+
+
+    const shape =
+        document.createElement("div");
+
+
+    shape.className="noteShape";
+
+
+    note.appendChild(shape);
+
+
+    document.getElementById("track")
+        .appendChild(note);
+
+
+    /*
+       Duración aproximada del viaje.
+
+       Esto crea la sensación tipo
+       Guitar Hero.
+    */
+
+    const travelTime =
+        2100;
+
+
+    note.dataset.created =
+        performance.now();
+
+
+    note.dataset.duration =
+        travelTime;
+
+
+    totalNotes++;
+
+
+    /*
+       Guardar referencia
+    */
+
+    activeNotes.push(note);
+
+}
+
+
+/* =========================
+   NOTAS ACTIVAS
+========================= */
+
+let activeNotes=[];
+
+
+function updateNotes(){
+
+    const now =
+        performance.now();
+
+
+    const trackHeight =
+        document.getElementById("track")
+        .clientHeight;
+
+
+    /*
+       Línea de impacto
+       aproximadamente 135 px
+       desde abajo.
+    */
+
+    const hitY =
+        trackHeight-135;
+
+
+    for(
+        let i=activeNotes.length-1;
+        i>=0;
+        i--
+    ){
+
+        const note =
+            activeNotes[i];
+
+
+        if(!note.isConnected){
+
+            activeNotes.splice(i,1);
+
+            continue;
+
+        }
+
+
+        const created =
+            Number(note.dataset.created);
+
+
+        const duration =
+            Number(note.dataset.duration);
+
+
+        const progress =
+            (now-created)/
+            duration;
+
+
+        /*
+           Posición vertical
+        */
+
+        const y =
+            -60+
+            progress*
+            (trackHeight+100);
+
+
+        note.style.top =
+            y+"px";
+
+
+        /*
+           Si supera la línea inferior
+        */
+
+        if(y > trackHeight+20){
+
+            registerMiss(note);
+
+            activeNotes.splice(i,1);
+
+            note.remove();
+
+        }
+
+    }
+
+}
+
+
+/* =========================
+   TOCAR GOTA
+========================= */
+
+function hitLane(lane){
+
+    if(!playing || paused)
+        return;
+
+
+    /*
+       Buscar la gota más cercana
+       a la línea en ese carril.
+    */
+
+    const track =
+        document.getElementById("track");
+
+
+    const trackHeight =
+        track.clientHeight;
+
+
+    const targetY =
+        trackHeight-135;
+
+
+    let closest=null;
+
+    let closestDistance=Infinity;
+
+
+    activeNotes.forEach(note=>{
+
+        if(
+            Number(note.dataset.lane)
+            !== lane
+        )
+            return;
+
+
+        const y =
+            parseFloat(note.style.top);
+
+
+        const distance =
+            Math.abs(y-targetY);
+
+
+        if(distance < closestDistance){
+
+            closestDistance=distance;
+
+            closest=note;
+
+        }
+
+    });
+
+
+    /*
+       Ventana de precisión
+    */
+
+    const hitWindow=75;
+
+
+    if(
+        closest &&
+        closestDistance <= hitWindow
+    ){
+
+        registerHit(
+            closest,
+            closestDistance
+        );
+
+    }else{
+
+        /*
+           Pulsación vacía
+        */
+
+        combo=0;
+
+        showFeedback(
+            "💦 ¡FALLASTE!",
+            false
+        );
+
+    }
+
+}
+
+
+/* =========================
+   HIT
+========================= */
+
+function registerHit(note,distance){
+
+    const index =
+        activeNotes.indexOf(note);
+
+
+    if(index!==-1)
+        activeNotes.splice(index,1);
+
+
+    /*
+       Precisión
+    */
+
+    let points=100;
+
+    let liters=1;
+
+
+    if(distance <= 20){
+
+        points=200;
+
+        liters=3;
+
+        showFeedback(
+            "💧 PERFECTO +200",
+            true
+        );
+
+    }else if(distance <=45){
+
+        points=150;
+
+        liters=2;
+
+        showFeedback(
+            "💧 BIEN +150",
+            true
+        );
+
+    }else{
+
+        points=100;
+
+        liters=1;
+
+        showFeedback(
+            "💧 HIT +100",
+            true
+        );
+
+    }
+
+
+    hits++;
+
+    combo++;
+
+    if(combo>bestCombo)
+        bestCombo=combo;
+
+
+    /*
+       Multiplicador
+    */
+
+    const multiplier =
+        Math.min(
+            5,
+            1+
+            Math.floor(combo/10)
+        );
+
+
+    points*=multiplier;
+
+
+    score+=points;
+
+    waterSaved+=liters;
+
+
+    /*
+       Recuperar reserva
+    */
+
+    reserve =
+        Math.min(
+            100,
+            reserve+0.15
+        );
+
+
+    /*
+       Animación
+    */
+
+    note.classList.add("good");
+
+
+    setTimeout(()=>{
+
+        note.remove();
+
+    },250);
+
+
+    /*
+       Actualizar
+    */
+
+    updateUI();
+
+}
+
+
+/* =========================
+   MISS
+========================= */
+
+function registerMiss(note){
+
+    missed++;
+
+    errors++;
+
+    combo=0;
+
+
+    /*
+       Cada gota perdida
+       representa desperdicio.
+    */
+
+    reserve =
+        Math.max(
+            0,
+            reserve-1.8
+        );
+
+
+    showFeedback(
+        "💧 - AGUA DESPERDICIADA",
+        false
+    );
+
+
+    /*
+       REQUISITO PRINCIPAL:
+
+       Cuando haya más de 10 gotas
+       falladas/perdidas, mostrar mensaje.
+
+       Usamos missed % 11 para que
+       ocurra cada 11 gotas después.
+    */
+
+    if(
+        missed > 10 &&
+        missed % 11 === 0
+    ){
+
+        showWaterMessage();
+
+    }
+
+
+    updateUI();
+
+
+    /*
+       Cinco errores:
+       advertencia fuerte.
+
+       No termina inmediatamente para
+       mantener la experiencia jugable.
+    */
+
+    if(errors>=5){
+
+        showWaterMessage();
+
+    }
+
+}
+
+
+/* =========================
+   MENSAJE EDUCATIVO
+========================= */
+
+function showWaterMessage(){
+
+    const box =
+        document.getElementById(
+            "waterMessage"
+        );
+
+
+    const text =
+        document.getElementById(
+            "messageText"
+        );
+
+
+    /*
+       Rotar entre los 10 mensajes
+    */
+
+    messageCounter++;
+
+
+    const index =
+        (messageCounter-1)
+        %
+        waterMessages.length;
+
+
+    text.textContent =
+        waterMessages[index];
+
+
+    /*
+       Mostrar
+    */
+
+    box.classList.remove("show");
+
+
+    /*
+       Forzar reflow
+    */
+
+    void box.offsetWidth;
+
+
+    box.classList.add("show");
+
+
+    /*
+       Ocultar después
+    */
+
+    setTimeout(()=>{
+
+        box.classList.remove("show");
+
+    },4200);
+
+}
+
+
+/* =========================
+   FEEDBACK
+========================= */
+
+function showFeedback(text,good){
+
+    const feedback =
+        document.createElement("div");
+
+
+    feedback.className =
+        "feedback "+
+        (good?"good":"bad");
+
+
+    feedback.textContent=text;
+
+
+    /*
+       Posición aleatoria cerca
+       del centro.
+    */
+
+    feedback.style.left =
+        (35+
+        Math.random()*30)
+        +"%";
+
+
+    feedback.style.top =
+        (45+
+        Math.random()*15)
+        +"%";
+
+
+    document
+        .querySelector(".stage")
+        .appendChild(feedback);
+
+
+    setTimeout(()=>{
+
+        feedback.remove();
+
+    },900);
+
+}
+
+
+/* =========================
+   UI
+========================= */
+
+function updateUI(){
+
+    document.getElementById("score")
+        .textContent =
+        String(score)
+        .padStart(6,"0");
+
+
+    document.getElementById("errors")
+        .textContent =
+        errors+" / 5";
+
+
+    document.getElementById("waterSaved")
+        .textContent =
+        waterSaved+" L";
+
+
+    document.getElementById("hits")
+        .textContent =
+        hits;
+
+
+    document.getElementById("missed")
+        .textContent =
+        missed;
+
+
+    document.getElementById("liters")
+        .textContent =
+        waterSaved;
+
+
+    document.getElementById("combo")
+        .textContent =
+        "x"+combo;
+
+
+    document.getElementById("bestCombo")
+        .textContent =
+        bestCombo;
+
+
+    /*
+       Precisión
+    */
+
+    const attempts =
+        hits+missed;
+
+
+    const accuracy =
+        attempts===0
+        ?100
+        :Math.round(
+            hits/attempts*100
+        );
+
+
+    document.getElementById("accuracy")
+        .textContent =
+        accuracy+"%";
+
+
+    /*
+       Reserva
+    */
+
+    document.getElementById("reserve")
+        .textContent =
+        Math.round(reserve);
+
+
+    document.getElementById("meterValue")
+        .textContent =
+        Math.round(reserve);
+
+
+    document.getElementById("reserveFill")
+        .style.width =
+        reserve+"%";
+
+
+    document.getElementById("meterWater")
+        .style.height =
+        reserve+"%";
+
+
+    /*
+       Ranking
+    */
+
+    updatePlayerRanking();
+
+
+    /*
+       Color de reserva
+    */
+
+    const fill =
+        document.getElementById(
+            "reserveFill"
+        );
+
+
+    if(reserve<30){
+
+        fill.style.background =
+            "linear-gradient(90deg,#ff1744,#ff6d00)";
+
+    }else if(reserve<55){
+
+        fill.style.background =
+            "linear-gradient(90deg,#ffcc00,#00d9ff)";
+
+    }else{
+
+        fill.style.background =
+            "linear-gradient(90deg,#00c8ff,#00ff9d)";
+
+    }
+
+}
+
+
+/* =========================
+   RANKING DEL JUGADOR
+========================= */
+
+function updatePlayerRanking(){
+
+    const player =
+        ranking.find(
+            x=>x.player
+        );
+
+
+    if(!player)
+        return;
+
+
+    /*
+       La puntuación del jugador
+       se refleja en el ranking.
+    */
+
+    player.points =
+        score;
+
+
+    renderRanking();
+
+}
+
+
+/* =========================
+   TIEMPO DE MÚSICA
+========================= */
+
+function updateMusicTime(){
+
+    if(!audio)
+        return;
+
+
+    const current =
+        audio.currentTime || 0;
+
+
+    const minutes =
+        Math.floor(
+            current/60
+        );
+
+
+    const seconds =
+        Math.floor(
+            current%60
+        )
+        .toString()
+        .padStart(2,"0");
+
+
+    document.getElementById(
+        "musicTime"
+    ).textContent =
+        minutes+":"+seconds;
+
+
+    /*
+       Si terminó la canción
+    */
+
+    if(
+        audio.ended &&
+        playing
+    ){
+
+        finishGame();
+
+    }
+
+}
+
+
+/* =========================
+   MÚSICA
+========================= */
+
+function toggleMusic(){
+
+    if(!audio)
+        return;
+
+
+    if(audio.paused){
+
+        audio.play();
+
+        paused=false;
+
+        document.getElementById(
+            "musicStatus"
+        ).textContent =
+        "▶ REPRODUCIENDO";
+
+    }else{
+
+        audio.pause();
+
+        paused=true;
+
+        document.getElementById(
+            "musicStatus"
+        ).textContent =
+        "⏸ PAUSADA";
+
+    }
+
+}
+
+
+/* =========================
+   PAUSA
+========================= */
+
+function pauseGame(){
+
+    if(!audio)
+        return;
+
+
+    paused=!paused;
+
+
+    if(paused){
+
+        audio.pause();
+
+        document.getElementById(
+            "musicStatus"
+        ).textContent =
+        "⏸ PAUSA";
+
+    }else{
+
+        audio.play();
+
+        document.getElementById(
+            "musicStatus"
+        ).textContent =
+        "▶ REPRODUCIENDO";
+
+    }
+
+}
+
+
+/* =========================
+   TECLADO
+========================= */
+
+document.addEventListener(
+    "keydown",
+    e=>{
+
+        const keys={
+
+            a:0,
+
+            s:1,
+
+            d:2,
+
+            f:3,
+
+            g:4
+
+        };
+
+
+        const key =
+            e.key.toLowerCase();
+
+
+        if(
+            keys[key] !== undefined
+        ){
+
+            const lane =
+                keys[key];
+
+
+            const button =
+                document.querySelector(
+                    `.hitBtn[data-lane="${lane}"]`
+                );
+
+
+            if(button){
+
+                button.classList.add(
+                    "active"
+                );
+
+
+                setTimeout(()=>{
+
+                    button.classList.remove(
+                        "active"
+                    );
+
+                },100);
+
+            }
+
+
+            hitLane(lane);
+
+        }
+
+
+        /*
+           Espacio pausa
+        */
+
+        if(e.code==="Space"){
+
+            e.preventDefault();
+
+            pauseGame();
+
+        }
+
+    }
+);
+
+
+/* =========================
+   CLICK / TOUCH
+========================= */
+
+document
+    .querySelectorAll(".hitBtn")
+    .forEach(btn=>{
+
+        btn.addEventListener(
+            "touchstart",
+            e=>{
+
+                e.preventDefault();
+
+                const lane =
+                    Number(
+                        btn.dataset.lane
+                    );
+
+
+                hitLane(lane);
+
+            },
+            {
+                passive:false
+            }
+        );
+
+    });
+
+
+/* =========================
+   FINAL
+========================= */
+
+function finishGame(){
+
+    playing=false;
+
+
+    if(audio){
+
+        audio.pause();
+
+    }
+
+
+    cancelAnimationFrame(
+        animationFrame
+    );
+
+
+    /*
+       Limpiar gotas
+    */
+
+    activeNotes.forEach(
+        note=>note.remove()
+    );
+
+
+    activeNotes=[];
+
+
+    /*
+       Modal
+    */
+
+    document.getElementById(
+        "gameOver"
+    ).style.display="flex";
+
+
+    document.getElementById(
+        "finalScore"
+    ).textContent =
+        score;
+
+
+    const attempts =
+        hits+missed;
+
+
+    const accuracy =
+        attempts===0
+        ?100
+        :Math.round(
+            hits/attempts*100
+        );
+
+
+    document.getElementById(
+        "finalStats"
+    ).innerHTML=`
+
+        <div style="
+            color:#00ffb0;
+            font-size:18px;
+            margin:10px;
+        ">
+            💧 ${waterSaved} litros ahorrados
+        </div>
+
+        <div style="
+            color:#7fd8ed;
+            margin:8px;
+        ">
+            🎯 Precisión: ${accuracy}%
+        </div>
+
+        <div style="
+            color:#7fd8ed;
+            margin:8px;
+        ">
+            🔥 Mejor combo: x${bestCombo}
+        </div>
+
+        <div style="
+            color:#ff6680;
+            margin:8px;
+        ">
+            💦 Gotas perdidas: ${missed}
+        </div>
+
+        <div style="
+            color:#00eaff;
+            margin:8px;
+        ">
+            🏆 Posición final:
+            ${document.getElementById("position").textContent}
+        </div>
+
+    `;
+
+}
+
+
+/* =========================
+   AUTO MENSAJE
+========================= */
+
+/*
+   Si se pierden muchas gotas,
+   también mostramos un mensaje
+   aunque el jugador siga jugando.
+
+   Esto comprueba periódicamente
+   la cantidad de gotas perdidas.
+*/
+
+let previousMissCheck=0;
+
+
+setInterval(()=>{
+
+    if(!playing || paused)
+        return;
+
+
+    if(
+        missed>=11 &&
+        missed!==previousMissCheck
+    ){
+
+        /*
+           Solo mostrar cuando
+           se alcance un nuevo múltiplo
+           de 11.
+        */
+
+        if(
+            missed % 11 === 0
+        ){
+
+            showWaterMessage();
+
+        }
+
+
+        previousMissCheck=missed;
+
+    }
+
+},300);
+
+
+/* =========================
+   EFECTO DE PULSO
+========================= */
+
+setInterval(()=>{
+
+    if(!playing || paused)
+        return;
+
+
+    const intensity =
+        Math.min(
+            1,
+            lastEnergy/255
+        );
+
+
+    const stream =
+        document.getElementById(
+            "waterStream"
+        );
+
+
+    if(stream){
+
+        stream.style.opacity =
+            .35+
+            intensity*.65;
+
+    }
+
+},80);
+
+
+/* =========================
+   PROTECCIÓN
+========================= */
+
+window.addEventListener(
+    "beforeunload",
+    ()=>{
+
+        if(audioURL){
+
+            URL.revokeObjectURL(
+                audioURL
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================
+   MENSAJE INICIAL DEL RANKING
+========================= */
+
+renderRanking();
+
+</script>
+
+</body>
+</html>

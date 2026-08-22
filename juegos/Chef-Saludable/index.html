@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chef Saludable HD - Edición PRO</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', 'Segoe UI', sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 10px;
+        }
+
+        /* Contenedor Principal PRO */
+        #game-container { 
+            width: 100%;
+            max-width: 750px; 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 25px; 
+            border-radius: 28px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            text-align: center;
+            position: relative;
+        }
+
+        h1 { 
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #38bdf8, #4ade80, #facc15);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
+
+        /* Botones Principales */
+        .btn { 
+            padding: 14px 28px; 
+            font-size: 16px; 
+            margin: 8px; 
+            border: none; 
+            border-radius: 14px; 
+            cursor: pointer; 
+            background: linear-gradient(135deg, #10b981, #059669); 
+            color: white; 
+            font-weight: bold; 
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            transition: all 0.2s ease;
+        }
+        .btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6); }
+
+        .btn-check { 
+            background: linear-gradient(135deg, #f59e0b, #d97706); 
+            font-size: 22px; 
+            padding: 16px 50px; 
+            margin-top: 15px; 
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+            letter-spacing: 1px;
+        }
+        .btn-check:hover { box-shadow: 0 10px 30px rgba(245, 158, 11, 0.7); }
+
+        /* HUD y Estado */
+        .status-header { 
+            display: flex; 
+            justify-content: space-between; 
+            font-weight: bold; 
+            font-size: 15px; 
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 20px;
+            border-radius: 14px;
+            color: #f1f5f9;
+        }
+
+        #life-bar-bg { 
+            width: 100%; 
+            background: rgba(255,255,255,0.1); 
+            height: 22px; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            margin: 10px 0; 
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        #life-bar { 
+            width: 100%; 
+            background: linear-gradient(90deg, #10b981, #34d399); 
+            height: 100%; 
+            transition: width 0.4s ease; 
+        }
+
+        .timer-box { font-size: 24px; color: #f43f5e; font-weight: 800; margin: 12px 0; text-shadow: 0 0 10px rgba(244, 63, 94, 0.5); }
+
+        /* Plato HD 3D con Animación Física */
+        #plate-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        #plate { 
+            width: 420px; 
+            height: 420px; 
+            background: radial-gradient(circle, #ffffff 60%, #e2e8f0 100%); 
+            border: 16px solid #cbd5e1; 
+            border-radius: 50%; 
+            position: relative;
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.6),
+                inset 0 10px 25px rgba(0,0,0,0.25),
+                0 0 0 8px rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        /* Items Rebotando */
+        .food-item { 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            cursor: pointer; 
+            border: 3px solid #cbd5e1; 
+            background: rgba(255, 255, 255, 0.95); 
+            user-select: none;
+            position: absolute;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            transition: border-color 0.2s, background 0.2s, transform 0.1s;
+        }
+        .food-item.selected { 
+            border-color: #10b981; 
+            background: #a7f3d0; 
+            box-shadow: 0 0 20px #10b981;
+            transform: scale(1.15);
+        }
+        .food-emoji { font-size: 26px; line-height: 1; pointer-events: none; }
+        .food-name { font-size: 8px; font-weight: 800; color: #1e293b; pointer-events: none; margin-top: 1px; }
+
+        /* Modal Educativo HD */
+        #edu-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 25px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: left;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+        .modal-title { color: #f43f5e; font-size: 22px; font-weight: bold; margin-bottom: 12px; }
+        .edu-reason { background: rgba(244, 63, 94, 0.15); border-left: 4px solid #f43f5e; padding: 10px 14px; margin: 8px 0; font-size: 13px; color: #fecdd3; border-radius: 0 8px 8px 0; }
+    </style>
+</head>
+<body>
+
+<!-- REEMPLAZA "TU_ENLACE_DE_MUSICA_AQUI.mp3" POR EL LINK DIRECTO DE TU MÚSICA -->
+<audio id="bg-audio" loop src="1 HOUR 👾ARCADE GAMING MUSIC👾 _ Gaming, Arcade, 8Bit, Fantasy, Science-Fiction, RPG, Retro, Console [Vec5yrhU-z0].mp3"></audio>
+
+<div id="game-container">
+    <h1>🥗 Chef Saludable PRO</h1>
+    <div class="subtitle">¡Captura los alimentos saludables mientras se mueven por el plato!</div>
+
+    <!-- Pantalla de Inicio -->
+    <div id="start-screen">
+        <h3 style="margin-bottom: 15px; color:#cbd5e1;">Selecciona la Dificultad:</h3>
+        <button class="btn" onclick="startGame('Fácil')">🟢 Fácil (10s | 10 Alimentos | Lento)</button><br>
+        <button class="btn" onclick="startGame('Medio')" style="background: linear-gradient(135deg, #0284c7, #0369a1);">🟡 Medio (7s | 15 Alimentos | Rápido)</button><br>
+        <button class="btn" onclick="startGame('Difícil')" style="background: linear-gradient(135deg, #e11d48, #be123c);">🔴 Difícil (5s | 20 Alimentos | Súper Rápido)</button>
+    </div>
+
+    <!-- Pantalla de Juego -->
+    <div id="play-screen" style="display: none;">
+        <div class="status-header">
+            <span>Ronda: <span id="round-txt" style="color:#38bdf8;">1</span>/5</span>
+            <span>Dificultad: <span id="diff-txt" style="color:#facc15;">Fácil</span></span>
+            <span>Puntos: <span id="score-txt" style="color:#4ade80;">0</span></span>
+        </div>
+
+        <div style="margin-top: 12px; text-align: left;">
+            <span style="font-weight: bold; font-size: 12px; color: #94a3b8;">Barra de Salud:</span>
+            <div id="life-bar-bg"><div id="life-bar"></div></div>
+        </div>
+
+        <div class="timer-box">⏱️ Tiempo: <span id="timer-txt">10</span>s</div>
+
+        <p style="color: #cbd5e1; font-size: 13px; margin: 0;">
+            Selecciona ÚNICAMENTE la comida <b>SALUDABLE</b> en movimiento y pulsa <b>REVISAR</b>
+        </p>
+
+        <div id="plate-wrapper">
+            <div id="plate"></div>
+        </div>
+
+        <button class="btn btn-check" onclick="checkPlate()">¡REVISAR PLATO!</button>
+    </div>
+
+    <!-- Pantalla de Fin de Juego -->
+    <div id="end-screen" style="display: none;">
+        <h2 id="end-title" style="font-size: 28px; margin-bottom: 10px;"></h2>
+        <p id="end-msg" style="font-size: 16px; color: #cbd5e1;"></p>
+        <div id="stars-display" style="font-size: 55px; margin: 20px 0;"></div>
+        <button class="btn" onclick="resetGame()">Volver a Jugar</button>
+    </div>
+</div>
+
+<!-- Modal Educativo al Fallar -->
+<div id="edu-modal">
+    <div class="modal-content">
+        <div class="modal-title">❌ Reporte Nutricional</div>
+        <p style="font-size: 13px; color: #cbd5e1;">Razones por las que fallaste en esta ronda:</p>
+        <div id="edu-reasons-list"></div>
+        <button class="btn" style="width: 100%; margin-top: 15px;" onclick="closeModal()">Entendido, Continuar</button>
+    </div>
+</div>
+
+<script>
+    const database = [
+        { name: 'Manzana', healthy: true, emoji: '🍎' },
+        { name: 'Brócoli', healthy: true, emoji: '🥦' },
+        { name: 'Zanahoria', healthy: true, emoji: '🥕' },
+        { name: 'Agua', healthy: true, emoji: '💧' },
+        { name: 'Pescado', healthy: true, emoji: '🐟' },
+        { name: 'Plátano', healthy: true, emoji: '🍌' },
+        { name: 'Aguacate', healthy: true, emoji: '🥑' },
+        { name: 'Huevo', healthy: true, emoji: '🥚' },
+        { name: 'Uvas', healthy: true, emoji: '🍇' },
+        { name: 'Naranja', healthy: true, emoji: '🍊' },
+        { name: 'Maíz', healthy: true, emoji: '🌽' },
+        { name: 'Leche', healthy: true, emoji: '🥛' },
+        { name: 'Frutilla', healthy: true, emoji: '🍓' },
+        { name: 'Sandía', healthy: true, emoji: '🍉' },
+
+        { name: 'Dona', healthy: false, emoji: '🍩', reason: '<b>🍩 Dona:</b> Llena de azúcares y grasas saturadas que producen caries y aumento excesivo de peso.' },
+        { name: 'Papas Fritas', healthy: false, emoji: '🍟', reason: '<b>🍟 Papas Fritas:</b> Contienen exceso de sal y aceites reutilizados que alteran la presión arterial.' },
+        { name: 'Pizza', healthy: false, emoji: '🍕', reason: '<b>🍕 Pizza Procesada:</b> Posee un alto contenido de sodio y grasas pesadas dificultando la digestión.' },
+        { name: 'Gaseosa', healthy: false, emoji: '🥤', reason: '<b>🥤 Gaseosa:</b> Aporta azúcar sin valor nutricional y debilita los dientes y huesos por su acidez.' },
+        { name: 'Hamburguesa', healthy: false, emoji: '🍔', reason: '<b>🍔 Hamburguesa Procesada:</b> Alta en grasas trans que aumentan el colesterol dañino.' },
+        { name: 'Caramelo', healthy: false, emoji: '🍬', reason: '<b>🍬 Caramelo:</b> Genera picos de azúcar en sangre sin brindar vitaminas ni energía de calidad.' },
+        { name: 'Pastel', healthy: false, emoji: '🍰', reason: '<b>🍰 Pastel:</b> Exceso de crema refinada y harinas blancas procesadas.' },
+        { name: 'Helado', healthy: false, emoji: '🍨', reason: '<b>🍨 Helado Industrial:</b> Contiene conservantes y alta concentración de grasa láctea saturada.' },
+        { name: 'Hot Dog', healthy: false, emoji: '🌭', reason: '<b>🌭 Hot Dog:</b> Los embutidos industriales poseen nitritos nocivos en consumo regular.' },
+        { name: 'Galletas', healthy: false, emoji: '🍪', reason: '<b>🍪 Galletas Dulces:</b> Altas en calorías vacías y aceites vegetales hidrogenados.' }
+    ];
+
+    let currentDiff = 'Fácil';
+    let round = 1;
+    let score = 0;
+    let health = 100;
+    let timeLimit = 10;
+    let timer = 10;
+    let timerInterval = null;
+    let animFrameId = null;
+
+    let itemsData = [];
+    const PLATE_RADIUS = 194; 
+    const PLATE_CENTER = 194; 
+    const ITEM_RADIUS = 30;   
+
+    function startGame(diff) {
+        currentDiff = diff;
+        round = 1;
+        score = 0;
+        health = 100;
+        
+        if (diff === 'Fácil') timeLimit = 10;
+        else if (diff === 'Medio') timeLimit = 7;
+        else if (diff === 'Difícil') timeLimit = 5;
+
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('play-screen').style.display = 'block';
+        document.getElementById('end-screen').style.display = 'none';
+        document.getElementById('diff-txt').innerText = diff;
+
+        // Reproducir música al hacer clic en iniciar (requerido por navegadores)
+        const audio = document.getElementById('bg-audio');
+        if (audio.paused) {
+            audio.play().catch(e => console.log("Asegúrate de haber puesto un link válido en la etiqueta de audio."));
+        }
+
+        loadRound();
+    }
+
+    function loadRound() {
+        if (round > 5) {
+            winGame();
+            return;
+        }
+
+        document.getElementById('round-txt').innerText = round;
+        document.getElementById('score-txt').innerText = score;
+        updateLifeBar();
+
+        let itemCount = currentDiff === 'Fácil' ? 10 : (currentDiff === 'Medio' ? 15 : 20);
+        let speedMult = currentDiff === 'Fácil' ? 1.2 : (currentDiff === 'Medio' ? 2.5 : 3.8);
+
+        let shuffled = [...database].sort(() => 0.5 - Math.random());
+        let selectedFoods = shuffled.slice(0, itemCount);
+
+        const plateEl = document.getElementById('plate');
+        plateEl.innerHTML = '';
+        itemsData = [];
+
+        selectedFoods.forEach((food, index) => {
+            let div = document.createElement('div');
+            div.className = 'food-item';
+            div.innerHTML = `
+                <span class="food-emoji">${food.emoji}</span>
+                <span class="food-name">${food.name}</span>
+            `;
+
+            let angle = Math.random() * Math.PI * 2;
+            let dist = Math.random() * (PLATE_RADIUS - ITEM_RADIUS - 10);
+            let x = PLATE_CENTER + dist * Math.cos(angle) - ITEM_RADIUS;
+            let y = PLATE_CENTER + dist * Math.sin(angle) - ITEM_RADIUS;
+
+            let moveAngle = Math.random() * Math.PI * 2;
+            let vx = Math.cos(moveAngle) * speedMult;
+            let vy = Math.sin(moveAngle) * speedMult;
+
+            let itemObj = { element: div, data: food, selected: false, x: x, y: y, vx: vx, vy: vy };
+
+            div.onclick = () => {
+                itemObj.selected = !itemObj.selected;
+                if (itemObj.selected) div.classList.add('selected');
+                else div.classList.remove('selected');
+            };
+
+            plateEl.appendChild(div);
+            itemsData.push(itemObj);
+        });
+
+        startTimer();
+        startPhysicsLoop();
+    }
+
+    function startPhysicsLoop() {
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+
+        function updatePhysics() {
+            itemsData.forEach(item => {
+                item.x += item.vx;
+                item.y += item.vy;
+
+                let centerX = item.x + ITEM_RADIUS;
+                let centerY = item.y + ITEM_RADIUS;
+                let dx = centerX - PLATE_CENTER;
+                let dy = centerY - PLATE_CENTER;
+                let distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+
+                let maxDist = PLATE_RADIUS - ITEM_RADIUS;
+                if (distanceFromCenter >= maxDist) {
+                    let nx = dx / distanceFromCenter;
+                    let ny = dy / distanceFromCenter;
+                    let dot = item.vx * nx + item.vy * ny;
+                    item.vx = item.vx - 2 * dot * nx;
+                    item.vy = item.vy - 2 * dot * ny;
+
+                    let correctedDist = maxDist - 1;
+                    item.x = PLATE_CENTER + nx * correctedDist - ITEM_RADIUS;
+                    item.y = PLATE_CENTER + ny * correctedDist - ITEM_RADIUS;
+                }
+
+                item.element.style.left = item.x + 'px';
+                item.element.style.top = item.y + 'px';
+            });
+
+            animFrameId = requestAnimationFrame(updatePhysics);
+        }
+
+        animFrameId = requestAnimationFrame(updatePhysics);
+    }
+
+    function stopPhysicsLoop() {
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timer = timeLimit;
+        document.getElementById('timer-txt').innerText = timer;
+
+        timerInterval = setInterval(() => {
+            timer--;
+            document.getElementById('timer-txt').innerText = timer;
+            if (timer <= 0) {
+                clearInterval(timerInterval);
+                stopPhysicsLoop();
+                failRound(["⏱️ <b>¡Tiempo Agotado!</b> Los alimentos se movieron muy rápido. ¡Debes ser más veloz para revisar!"]);
+            }
+        }, 1000);
+    }
+
+    function checkPlate() {
+        clearInterval(timerInterval);
+        stopPhysicsLoop();
+
+        let mistakes = [];
+        itemsData.forEach(item => {
+            if (!item.data.healthy && item.selected) mistakes.push(item.data.reason);
+            if (item.data.healthy && !item.selected) mistakes.push(`<b>${item.data.emoji} ${item.data.name}:</b> ¡Es un alimento saludable! Olvidaste atraparlo.`);
+        });
+
+        if (mistakes.length === 0) {
+            score += 10;
+            alert("✨ ¡Excelente Precisión! Armaste un plato 100% Nutritivo. (+10 Puntos)");
+            round++;
+            loadRound();
+        } else {
+            failRound(mistakes);
+        }
+    }
+
+    function failRound(reasons) {
+        health -= 20;
+        updateLifeBar();
+
+        const listEl = document.getElementById('edu-reasons-list');
+        listEl.innerHTML = '';
+        reasons.forEach(r => {
+            let div = document.createElement('div');
+            div.className = 'edu-reason';
+            div.innerHTML = r;
+            listEl.appendChild(div);
+        });
+
+        document.getElementById('edu-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('edu-modal').style.display = 'none';
+        if (health <= 0) gameOver();
+        else { round++; loadRound(); }
+    }
+
+    function updateLifeBar() {
+        if (health < 0) health = 0;
+        const lifeBar = document.getElementById('life-bar');
+        lifeBar.style.width = health + '%';
+        
+        if (health <= 30) lifeBar.style.background = 'linear-gradient(90deg, #ef4444, #f87171)';
+        else if (health <= 60) lifeBar.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+        else lifeBar.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
+    }
+
+    function winGame() {
+        clearInterval(timerInterval);
+        stopPhysicsLoop();
+        document.getElementById('play-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'block';
+
+        document.getElementById('end-title').innerHTML = '<span style="color:#facc15;">🎉 ¡VICTORIA TOTAL!</span>';
+        document.getElementById('end-msg').innerText = `Completaste exitosamente las 5 rondas en dificultad ${currentDiff} acumulando ${score} puntos.`;
+        document.getElementById('stars-display').innerText = '⭐ (¡1 Estrella Conquistada!)';
+    }
+
+    function gameOver() {
+        clearInterval(timerInterval);
+        stopPhysicsLoop();
+        document.getElementById('play-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'block';
+
+        document.getElementById('end-title').innerHTML = '<span style="color:#f43f5e;">💔 JUEGO TERMINADO</span>';
+        document.getElementById('end-msg').innerText = 'Tu barra de salud llegó a 0%. ¡Vuelve a entrenar tus reflejos y nutrición!';
+        document.getElementById('stars-display').innerText = '❌ Sin Estrellas';
+    }
+
+    function resetGame() {
+        document.getElementById('end-screen').style.display = 'none';
+        document.getElementById('start-screen').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>S
