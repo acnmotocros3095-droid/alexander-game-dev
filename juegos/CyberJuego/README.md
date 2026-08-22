@@ -15,8 +15,8 @@ Adventure / Narrativa interactiva.
 
 ## Capturas de pantalla
 1. **Inicio:** Mateo creando contenido burlesco en el chat.
-![Inicio](../imagenes/cyber1.png)
+![Inicio](imagenes/cyber1.png)
 2. **Gameplay:** Escena de "Fuga de Control" donde la víctima abandona el colegio.
-![Gameplay](../imagenes/cyber2.png)
+![Gameplay](imagenes/cyber2.png)
 3. **Victoria:** Mateo utilizando su influencia para frenar el acoso en su comunidad.
-![Victoria](../imagenes/cyber3.png)
+![Victoria](imagenes/cyber3.png)
